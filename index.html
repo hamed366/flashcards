@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="fa">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Flashcard — Single Card</title>
+  <style>
+    :root{--bg:#f3f6f9;--card:#ffffff;--accent:#2b6cb0;--muted:#666}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:linear-gradient(180deg,#eef2f7 0%,var(--bg) 100%);display:flex;align-items:center;justify-content:center}
+    .wrap{display:flex;gap:24px;align-items:center}
+    button{background:transparent;border:0;padding:12px 16px;border-radius:8px;font-size:14px;cursor:pointer}
+    button:focus{outline:2px solid rgba(43,108,176,.18)}
+    .nav-btn{background:transparent;color:var(--accent);border:1px solid rgba(43,108,176,.12);} 
+    .nav-btn[disabled]{opacity:.35;cursor:not-allowed}
+
+    .card-container{width:420px;height:260px;perspective:1200px;display:flex;align-items:center;justify-content:center}
+    .card{width:100%;height:100%;border-radius:14px;background:var(--card);box-shadow:0 10px 30px rgba(0,0,0,.08);transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.9,.3,1);position:relative;display:flex;align-items:center;justify-content:center}
+    .card.flipped{transform:rotateY(180deg)}
+    .face{position:absolute;inset:0;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;padding:28px;box-sizing:border-box}
+    .front{font-size:96px;font-weight:700;color:#111;background:#D5F1D7;border-radius:14px;}
+    .back{transform:rotateY(180deg);display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:32px 28px;gap:24px;background:#E9F2FF;border-radius:14px;}
+    .pinyin{font-size:60px;color:var(--accent);font-weight:800;text-align:center;width:100%;}
+    .meaning{font-size:48px;color:#222;font-weight:700;text-align:center;width:100%;line-height:1.5;}
+
+    .controls{display:flex;flex-direction:column;gap:8px;align-items:center}
+    .small{font-size:12px;color:var(--muted)}
+    .flip-btn{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:0}
+  </style>
+</head>
+<body>
+  <h1 style="position:fixed; top:12px; width:100%; text-align:center; font-size:99px; font-weight:900; margin:0;
+  font-family:'KaiTi','Kaiti SC','STKaiti','FangSong','STFangsong',serif;
+  color:#ff0000;">
+  一班
+</h1>
+  <div class="wrap">
+    <button id="prevBtn" class="nav-btn" aria-label="Previous">◀</button>
+
+    <div class="card-container">
+      <div id="card" class="card" role="button" tabindex="0" aria-pressed="false">
+        <div class="face front" id="frontFace">字</div>
+        <div class="face back" id="backFace">
+          <div class="pinyin" id="pinyin"></div>
+          <div style="width:100%;height:6px;background:#000;border-radius:3px;margin:8px 0;"></div>
+          <div class="meaning" id="meaning">English meaning goes here</div>
+        </div>
+      </div>
+    </div>
+
+    <button id="nextBtn" class="nav-btn" aria-label="Next">▶</button>
+  </div>
+
+  <div style="position:fixed;left:16px;bottom:18px;display:flex;gap:8px;align-items:center">
+    <button id="flipBtn" class="flip-btn">Flip</button>
+    <div class="small">Click card or press ← → to navigate, Space to flip</div>
+  </div>
+
+  <script>
+    // Single-card data (sorted at runtime)
+    const cards = [
+      {char: '哪', pinyin: 'nǎ', meaning: 'which'},
+      {char: '哪儿', pinyin: 'nǎr', meaning: 'where'},
+      {char: '男', pinyin: 'nán', meaning: 'male; man'},
+      {char: '南', pinyin: 'nán', meaning: 'south'},
+      {char: '难', pinyin: 'nán', meaning: 'difficult; hard'},
+      {char: '难受', pinyin: 'nánshòu', meaning: 'feel unwell'},
+      {char: '呢', pinyin: 'ne', meaning: 'modal particle'},
+      {char: '你', pinyin: 'nǐ', meaning: 'you (singular)'},
+      {char: '你们', pinyin: 'nǐmen', meaning: 'you (plural)'},
+      {char: '年', pinyin: 'nián', meaning: 'year'},
+      {char: '您', pinyin: 'nín', meaning: 'you (polite)'},
+      {char: '牛奶', pinyin: 'niúnǎi', meaning: 'milk'},
+      {char: '牛肉', pinyin: 'niúròu', meaning: 'beef'},
+      {char: '女', pinyin: 'nǚ', meaning: 'female; woman'},
+
+      {char: '当然', pinyin: 'dāngrán', meaning: 'of course'},
+      {char: '的', pinyin: 'de', meaning: 'marker of complement'},
+      {char: '的', pinyin: 'de', meaning: 'of; used after an attributive'},
+      {char: '等', pinyin: 'děng', meaning: 'to wait for'},
+      {char: '弟弟', pinyin: 'dìdi', meaning: 'younger brother'},
+      {char: '地图', pinyin: 'dìtú', meaning: 'map'},
+      {char: '点', pinyin: 'diǎn', meaning: 'to order dishes; o’clock'},
+      {char: '电话', pinyin: 'diànhuà', meaning: 'telephone'},
+      {char: '电脑', pinyin: 'diànnǎo', meaning: 'computer'},
+      {char: '电视', pinyin: 'diànshì', meaning: 'television'},
+      {char: '电视机', pinyin: 'diànshìjī', meaning: 'television set'},
+      {char: '东', pinyin: 'dōng', meaning: 'east'},
+      {char: '东西', pinyin: 'dōngxi', meaning: 'thing; stuff'},
+      {char: '动物', pinyin: 'dòngwù', meaning: 'animals'},
+      {char: '动物园', pinyin: 'dòngwùyuán', meaning: 'zoo'},
+      {char: '都', pinyin: 'dōu', meaning: 'all; both'},
+      {char: '读', pinyin: 'dú', meaning: 'to read'},
+      {char: '肚子', pinyin: 'dùzi', meaning: 'belly'},
+      {char: '短', pinyin: 'duǎn', meaning: 'short'},
+      {char: '锻炼', pinyin: 'duànliàn', meaning: 'to do exercises'},
+
+      {char: '阿', pinyin: 'a', meaning: 'modal particle; oh; ah'},
+      {char: '爱', pinyin: 'ài', meaning: 'to love'},
+      {char: '爱好', pinyin: 'àihào', meaning: 'hobby; to like'},
+      {char: '安静', pinyin: 'ānjìng', meaning: 'quiet'},
+      {char: '把', pinyin: 'bǎ', meaning: 'measure word for things with a handle'},
+      {char: '爸爸', pinyin: 'bàba', meaning: 'dad'},
+      {char: '吧', pinyin: 'ba', meaning: 'modal particle (suggestion/uncertainty)'},
+      {char: '白', pinyin: 'bái', meaning: 'white'},
+      {char: '班', pinyin: 'bān', meaning: 'class'},
+      {char: '半', pinyin: 'bàn', meaning: 'half'},
+      {char: '办公室', pinyin: 'bàngōngshì', meaning: 'office'},
+      {char: '帮助', pinyin: 'bāngzhù', meaning: 'to help; assist'},
+      {char: '包子', pinyin: 'bāozi', meaning: 'steamed bun'},
+      {char: '杯', pinyin: 'bēi', meaning: 'glass; cup (classifier)'},
+      {char: '杯子', pinyin: 'bēizi', meaning: 'cup'},
+      {char: '北', pinyin: 'běi', meaning: 'north'},
+      {char: '北方', pinyin: 'běifāng', meaning: 'northern'},
+
+      {char: '吃', pinyin: 'chī', meaning: 'to eat'},
+      {char: '吃饭', pinyin: 'chīfàn', meaning: 'to have a meal'},
+      {char: '出', pinyin: 'chū', meaning: 'to go out; to be out'},
+      {char: '出去', pinyin: 'chūqù', meaning: 'to go out'},
+      {char: '出租车', pinyin: 'chūzūchē', meaning: 'taxi'},
+      {char: '厨房', pinyin: 'chúfáng', meaning: 'kitchen'},
+      {char: '穿', pinyin: 'chuān', meaning: 'to wear'},
+      {char: '窗户', pinyin: 'chuānghu', meaning: 'window'},
+      {char: '聪明', pinyin: 'cōngmíng', meaning: 'clever; smart'},
+      {char: '从', pinyin: 'cóng', meaning: 'from'},
+
+      {char: '打电话', pinyin: 'dǎ diànhuà', meaning: 'to make a call'},
+      {char: '打算', pinyin: 'dǎsuàn', meaning: 'to plan; to intend'},
+      {char: '打折', pinyin: 'dǎzhé', meaning: 'to give a discount'},
+      {char: '打针', pinyin: 'dǎzhēn', meaning: 'to give/have an injection'},
+      {char: '大', pinyin: 'dà', meaning: 'big'},
+      {char: '大家', pinyin: 'dàjiā', meaning: 'everyone; everybody'},
+      {char: '大小', pinyin: 'dàxiǎo', meaning: 'size'},
+      {char: '带', pinyin: 'dài', meaning: 'to bring; to carry'},
+      {char: '但是', pinyin: 'dànshì', meaning: 'but; however'},
+      {char: '蛋糕', pinyin: 'dàngāo', meaning: 'cake'},
+      {char: '对', pinyin: 'duì', meaning: 'correct; yes'},
+      {char: '多', pinyin: 'duō', meaning: 'many; much'},
+      {char: '多少', pinyin: 'duōshao', meaning: 'how many; how much'},
+
+      {char: '儿子', pinyin: 'érzi', meaning: 'son'},
+      {char: '二', pinyin: 'èr', meaning: 'two'},
+      {char: '发烧', pinyin: 'fāshāo', meaning: 'to have a fever'},
+      {char: '饭店', pinyin: 'fàndiàn', meaning: 'restaurant; hotel'},
+      {char: '房间', pinyin: 'fángjiān', meaning: 'room'},
+      {char: '服务员', pinyin: 'fúwùyuán', meaning: 'attendant; waiter/waitress'},
+      {char: '干净', pinyin: 'gānjìng', meaning: 'clean, neat and tidy'},
+      {char: '高兴', pinyin: 'gāoxìng', meaning: 'glad; happy'},
+      {char: '告诉', pinyin: 'gàosu', meaning: 'to tell'},
+      {char: '哥哥', pinyin: 'gēge', meaning: 'elder brother'},
+      {char: '工作', pinyin: 'gōngzuò', meaning: 'work; job'},
+
+      {char: '好', pinyin: 'hǎo', meaning: 'good'}
+    ];
+
+    // sort cards by pinyin (custom A→Z without tones)
+function normalizePinyin(p){
+  return p
+    .replace(/ā|á|ǎ|à/g,'a')
+    .replace(/ē|é|ě|è/g,'e')
+    .replace(/ī|í|ǐ|ì/g,'i')
+    .replace(/ō|ó|ǒ|ò/g,'o')
+    .replace(/ū|ú|ǔ|ù/g,'u')
+    .replace(/ǖ|ǘ|ǚ|ǜ/g,'v')
+    .replace(/ü/g,'v')
+    .toLowerCase();
+}
+
+cards.sort((a,b) => normalizePinyin(a.pinyin).localeCompare(normalizePinyin(b.pinyin)));
+
+
+    let index = 0;
+    const cardEl = document.getElementById('card');
+    const frontFace = document.getElementById('frontFace');
+    const backFace = document.getElementById('backFace');
+    const pinyinEl = document.getElementById('pinyin');
+    const meaningEl = document.getElementById('meaning');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const flipBtn = document.getElementById('flipBtn');
+
+    function render() {
+      if (!cards.length) return;
+      const c = cards[index];
+      frontFace.textContent = c.char;
+      pinyinEl.textContent = c.pinyin;
+      meaningEl.textContent = c.meaning;
+      prevBtn.disabled = false;
+      nextBtn.disabled = false;
+      cardEl.classList.remove('flipped');
+    }
+
+    function flip() {
+      const flipped = cardEl.classList.toggle('flipped');
+      cardEl.setAttribute('aria-pressed', flipped);
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (cards.length <= 1) return;
+      index = (index - 1 + cards.length) % cards.length;
+      render();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (cards.length <= 1) return;
+      index = (index + 1) % cards.length;
+      render();
+    });
+
+    flipBtn.addEventListener('click', flip);
+    cardEl.addEventListener('click', flip);
+    cardEl.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); flip(); }});
+
+    // keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') prevBtn.click();
+      if (e.key === 'ArrowRight') nextBtn.click();
+      if (e.code === 'Space') { e.preventDefault(); flip(); }
+    });
+
+    // initial render
+    render();
+  </script>
+</body>
+</html>
