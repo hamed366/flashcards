@@ -59,42 +59,6 @@
   <script>
     // Single-card data (sorted at runtime)
     const cards = [
-      {char: '哪', pinyin: 'nǎ', meaning: 'which'},
-      {char: '哪儿', pinyin: 'nǎr', meaning: 'where'},
-      {char: '男', pinyin: 'nán', meaning: 'male; man'},
-      {char: '南', pinyin: 'nán', meaning: 'south'},
-      {char: '难', pinyin: 'nán', meaning: 'difficult; hard'},
-      {char: '难受', pinyin: 'nánshòu', meaning: 'feel unwell'},
-      {char: '呢', pinyin: 'ne', meaning: 'modal particle'},
-      {char: '你', pinyin: 'nǐ', meaning: 'you (singular)'},
-      {char: '你们', pinyin: 'nǐmen', meaning: 'you (plural)'},
-      {char: '年', pinyin: 'nián', meaning: 'year'},
-      {char: '您', pinyin: 'nín', meaning: 'you (polite)'},
-      {char: '牛奶', pinyin: 'niúnǎi', meaning: 'milk'},
-      {char: '牛肉', pinyin: 'niúròu', meaning: 'beef'},
-      {char: '女', pinyin: 'nǚ', meaning: 'female; woman'},
-
-      {char: '当然', pinyin: 'dāngrán', meaning: 'of course'},
-      {char: '的', pinyin: 'de', meaning: 'marker of complement'},
-      {char: '的', pinyin: 'de', meaning: 'of; used after an attributive'},
-      {char: '等', pinyin: 'děng', meaning: 'to wait for'},
-      {char: '弟弟', pinyin: 'dìdi', meaning: 'younger brother'},
-      {char: '地图', pinyin: 'dìtú', meaning: 'map'},
-      {char: '点', pinyin: 'diǎn', meaning: 'to order dishes; o’clock'},
-      {char: '电话', pinyin: 'diànhuà', meaning: 'telephone'},
-      {char: '电脑', pinyin: 'diànnǎo', meaning: 'computer'},
-      {char: '电视', pinyin: 'diànshì', meaning: 'television'},
-      {char: '电视机', pinyin: 'diànshìjī', meaning: 'television set'},
-      {char: '东', pinyin: 'dōng', meaning: 'east'},
-      {char: '东西', pinyin: 'dōngxi', meaning: 'thing; stuff'},
-      {char: '动物', pinyin: 'dòngwù', meaning: 'animals'},
-      {char: '动物园', pinyin: 'dòngwùyuán', meaning: 'zoo'},
-      {char: '都', pinyin: 'dōu', meaning: 'all; both'},
-      {char: '读', pinyin: 'dú', meaning: 'to read'},
-      {char: '肚子', pinyin: 'dùzi', meaning: 'belly'},
-      {char: '短', pinyin: 'duǎn', meaning: 'short'},
-      {char: '锻炼', pinyin: 'duànliàn', meaning: 'to do exercises'},
-
       {char: '阿', pinyin: 'a', meaning: 'modal particle; oh; ah'},
       {char: '爱', pinyin: 'ài', meaning: 'to love'},
       {char: '爱好', pinyin: 'àihào', meaning: 'hobby; to like'},
@@ -108,14 +72,31 @@
       {char: '办公室', pinyin: 'bàngōngshì', meaning: 'office'},
       {char: '帮助', pinyin: 'bāngzhù', meaning: 'to help; assist'},
       {char: '包子', pinyin: 'bāozi', meaning: 'steamed bun'},
-      {char: '杯', pinyin: 'bēi', meaning: 'glass; cup (classifier)'},
       {char: '杯子', pinyin: 'bēizi', meaning: 'cup'},
       {char: '北', pinyin: 'běi', meaning: 'north'},
       {char: '北方', pinyin: 'běifāng', meaning: 'northern'},
-
+      {char: '本', pinyin: 'běn', meaning: 'measure word for volume'},
+      {char: '比较', pinyin: 'bǐjiào', meaning: 'comparatively; relatively'},
+      {char: '比赛', pinyin: 'bǐsài', meaning: 'competition; match'},
+      {char: '笔记本', pinyin: 'bǐjìběn', meaning: 'notebook'},
+      {char: '别的', pinyin: 'biéde', meaning: 'other'},
+      {char: '宾馆', pinyin: 'bīnguǎn', meaning: 'hotel'},
+      {char: '冰箱', pinyin: 'bīngxiāng', meaning: 'refrigerator'},
+      {char: '菜', pinyin: 'cài', meaning: 'dish; food'},
+      {char: '菜单', pinyin: 'càidān', meaning: 'menu'},
+      {char: '参加', pinyin: 'cānjiā', meaning: 'to join; to attend'},
+      {char: '层', pinyin: 'céng', meaning: 'floor'},
+      {char: '茶', pinyin: 'chá', meaning: 'tea'},
+      {char: '长', pinyin: 'cháng', meaning: 'long'},
+      {char: '常常', pinyin: 'chángcháng', meaning: 'often; usually'},
+      {char: '唱歌', pinyin: 'chànggē', meaning: 'to sing'},
+      {char: '超市', pinyin: 'chāoshì', meaning: 'supermarket'},
+      {char: '炒', pinyin: 'chǎo', meaning: 'stir fry'},
+      {char: '衬衫', pinyin: 'chènshān', meaning: 'shirt'},
+      {char: '城市', pinyin: 'chéngshì', meaning: 'city'},
       {char: '吃', pinyin: 'chī', meaning: 'to eat'},
       {char: '吃饭', pinyin: 'chīfàn', meaning: 'to have a meal'},
-      {char: '出', pinyin: 'chū', meaning: 'to go out; to be out'},
+      {char: '出', pinyin: 'chū', meaning: 'to go out'},
       {char: '出去', pinyin: 'chūqù', meaning: 'to go out'},
       {char: '出租车', pinyin: 'chūzūchē', meaning: 'taxi'},
       {char: '厨房', pinyin: 'chúfáng', meaning: 'kitchen'},
@@ -123,50 +104,164 @@
       {char: '窗户', pinyin: 'chuānghu', meaning: 'window'},
       {char: '聪明', pinyin: 'cōngmíng', meaning: 'clever; smart'},
       {char: '从', pinyin: 'cóng', meaning: 'from'},
-
       {char: '打电话', pinyin: 'dǎ diànhuà', meaning: 'to make a call'},
       {char: '打算', pinyin: 'dǎsuàn', meaning: 'to plan; to intend'},
       {char: '打折', pinyin: 'dǎzhé', meaning: 'to give a discount'},
-      {char: '打针', pinyin: 'dǎzhēn', meaning: 'to give/have an injection'},
       {char: '大', pinyin: 'dà', meaning: 'big'},
-      {char: '大家', pinyin: 'dàjiā', meaning: 'everyone; everybody'},
-      {char: '大小', pinyin: 'dàxiǎo', meaning: 'size'},
-      {char: '带', pinyin: 'dài', meaning: 'to bring; to carry'},
+      {char: '大家', pinyin: 'dàjiā', meaning: 'everyone'},
+      {char: '带', pinyin: 'dài', meaning: 'to bring'},
       {char: '但是', pinyin: 'dànshì', meaning: 'but; however'},
       {char: '蛋糕', pinyin: 'dàngāo', meaning: 'cake'},
-      {char: '对', pinyin: 'duì', meaning: 'correct; yes'},
-      {char: '多', pinyin: 'duō', meaning: 'many; much'},
-      {char: '多少', pinyin: 'duōshao', meaning: 'how many; how much'},
-
-      {char: '儿子', pinyin: 'érzi', meaning: 'son'},
-      {char: '二', pinyin: 'èr', meaning: 'two'},
-      {char: '发烧', pinyin: 'fāshāo', meaning: 'to have a fever'},
-      {char: '饭店', pinyin: 'fàndiàn', meaning: 'restaurant; hotel'},
-      {char: '房间', pinyin: 'fángjiān', meaning: 'room'},
-      {char: '服务员', pinyin: 'fúwùyuán', meaning: 'attendant; waiter/waitress'},
-      {char: '干净', pinyin: 'gānjìng', meaning: 'clean, neat and tidy'},
+      {char: '的', pinyin: 'de', meaning: 'particle; of'},
+      {char: '等', pinyin: 'děng', meaning: 'to wait for'},
+      {char: '弟弟', pinyin: 'dìdi', meaning: 'younger brother'},
+      {char: '地图', pinyin: 'dìtú', meaning: 'map'},
+      {char: '点', pinyin: 'diǎn', meaning: 'o\'clock; to order'},
+      {char: '电话', pinyin: 'diànhuà', meaning: 'telephone'},
+      {char: '弹钢琴', pinyin: 'tán gāngqín', meaning: 'to play piano'},
       {char: '高兴', pinyin: 'gāoxìng', meaning: 'glad; happy'},
       {char: '告诉', pinyin: 'gàosu', meaning: 'to tell'},
       {char: '哥哥', pinyin: 'gēge', meaning: 'elder brother'},
+      {char: '个', pinyin: 'gè', meaning: 'general measure word'},
+      {char: '给', pinyin: 'gěi', meaning: 'to give'},
+      {char: '公交汽车', pinyin: 'gōnggòng qìchē', meaning: 'bus'},
       {char: '工作', pinyin: 'gōngzuò', meaning: 'work; job'},
-
-      {char: '好', pinyin: 'hǎo', meaning: 'good'}
+      {char: '狗', pinyin: 'gǒu', meaning: 'dog'},
+      {char: '购物', pinyin: 'gòuwù', meaning: 'shopping; to go shopping'},
+      {char: '贵', pinyin: 'guì', meaning: 'expensive'},
+      {char: '国家', pinyin: 'guó', meaning: 'country'},
+      {char: '还', pinyin: 'hái', meaning: 'still; even more'},
+      {char: '汉语', pinyin: 'Hànyǔ', meaning: 'Chinese (language)'},
+      {char: '汉字', pinyin: 'Hànzì', meaning: 'Chinese character'},
+      {char: '好', pinyin: 'hǎo', meaning: 'good'},
+      {char: '好吃', pinyin: 'hǎochī', meaning: 'delicious'},
+      {char: '号', pinyin: 'hào', meaning: 'number; date'},
+      {char: '喝', pinyin: 'hē', meaning: 'to drink'},
+      {char: '黑板', pinyin: 'hēibǎn', meaning: 'blackboard'},
+      {char: '很', pinyin: 'hěn', meaning: 'very'},
+      {char: '红', pinyin: 'hóng', meaning: 'red'},
+      {char: '鸡蛋', pinyin: 'jīdàn', meaning: 'egg'},
+      {char: '几', pinyin: 'jǐ', meaning: 'how many; how much'},
+      {char: '家', pinyin: 'jiā', meaning: 'home; family'},
+      {char: '家具', pinyin: 'jiājù', meaning: 'furniture'},
+      {char: '价格', pinyin: 'jiàgé', meaning: 'price'},
+      {char: '检查', pinyin: 'jiǎnchá', meaning: 'to check'},
+      {char: '见', pinyin: 'jiàn', meaning: 'to meet; to see'},
+      {char: '叫', pinyin: 'jiào', meaning: 'to be called'},
+      {char: '教', pinyin: 'jiāo', meaning: 'to teach'},
+      {char: '教室', pinyin: 'jiàoshì', meaning: 'classroom'},
+      {char: '介绍', pinyin: 'jièshào', meaning: 'to introduce'},
+      {char: '看', pinyin: 'kàn', meaning: 'to watch; to look; to see'},
+      {char: '开始', pinyin: 'kāishǐ', meaning: 'to begin; to start'},
+      {char: '考', pinyin: 'kǎo', meaning: 'to test; to take an exam'},
+      {char: '可以', pinyin: 'kěyǐ', meaning: 'can; may'},
+      {char: '客人', pinyin: 'kèrén', meaning: 'guest'},
+      {char: '空调', pinyin: 'kōngtiáo', meaning: 'air-conditioner'},
+      {char: '快', pinyin: 'kuài', meaning: 'fast; quickly'},
+      {char: '快乐', pinyin: 'kuàilè', meaning: 'happy'},
+      {char: '老师', pinyin: 'lǎoshī', meaning: 'teacher'},
+      {char: '了', pinyin: 'le', meaning: 'modal particle indicating change / completed action'},
+      {char: '冷', pinyin: 'lěng', meaning: 'cold'},
+      {char: '里', pinyin: 'lǐ', meaning: 'inside'},
+      {char: '两', pinyin: 'liǎng', meaning: 'two'},
+      {char: '零', pinyin: 'líng', meaning: 'zero'},
+      {char: '六', pinyin: 'liù', meaning: 'six'},
+      {char: '楼', pinyin: 'lóu', meaning: 'building; floor'},
+      {char: '妈妈', pinyin: 'māma', meaning: 'mum'},
+      {char: '马上', pinyin: 'mǎshàng', meaning: 'immediately; at once'},
+      {char: '买', pinyin: 'mǎi', meaning: 'to buy'},
+      {char: '卖', pinyin: 'mài', meaning: 'to sell'},
+      {char: '猫', pinyin: 'māo', meaning: 'cat'},
+      {char: '没有', pinyin: 'méiyǒu', meaning: 'have not'},
+      {char: '每', pinyin: 'měi', meaning: 'every; each'},
+      {char: '名字', pinyin: 'míngzi', meaning: 'name'},
+      {char: '哪', pinyin: 'nǎ', meaning: 'which'},
+      {char: '哪儿', pinyin: 'nǎr', meaning: 'where'},
+      {char: '男', pinyin: 'nán', meaning: 'male; man'},
+      {char: '南', pinyin: 'nán', meaning: 'south'},
+      {char: '难', pinyin: 'nán', meaning: 'difficult; hard'},
+      {char: '难受', pinyin: 'nánshòu', meaning: 'feel unwell'},
+      {char: '呢', pinyin: 'ne', meaning: 'modal particle'},
+      {char: '你', pinyin: 'nǐ', meaning: 'you (singular)'},
+      {char: '你们', pinyin: 'nǐmen', meaning: 'you (plural)'},
+      {char: '区', pinyin: 'qū', meaning: 'area; district'},
+      {char: '起床', pinyin: 'qǐchuáng', meaning: 'to get up'},
+      {char: '钱', pinyin: 'qián', meaning: 'money'},
+      {char: '前面', pinyin: 'qiánmiàn', meaning: 'in front'},
+      {char: '请', pinyin: 'qǐng', meaning: 'please; to invite'},
+      {char: '去', pinyin: 'qù', meaning: 'to go; to leave'},
+      {char: '热', pinyin: 'rè', meaning: 'hot'},
+      {char: '人', pinyin: 'rén', meaning: 'person; people'},
+      {char: '认识', pinyin: 'rènshi', meaning: 'to know'},
+      {char: '三', pinyin: 'sān', meaning: 'three'},
+      {char: '商店', pinyin: 'shāngdiàn', meaning: 'store; shop'},
+      {char: '上课', pinyin: 'shàngkè', meaning: 'to go to class; to attend class'},
+      {char: '上网', pinyin: 'shàngwǎng', meaning: 'to be on the Internet'},
+      {char: '上午', pinyin: 'shàngwǔ', meaning: 'forenoon'},
+      {char: '少', pinyin: 'shǎo', meaning: 'few; little'},
+      {char: '谁', pinyin: 'shéi', meaning: 'who'},
+      {char: '身体', pinyin: 'shēntǐ', meaning: 'body'},
+      {char: '生病', pinyin: 'shēngbìng', meaning: 'to be sick'},
+      {char: '生活', pinyin: 'shēnghuó', meaning: 'life'},
+      {char: '生日', pinyin: 'shēngrì', meaning: 'birthday'},
+      {char: '事情', pinyin: 'shìqing', meaning: 'thing; matter'},
+      {char: '试', pinyin: 'shì', meaning: 'to try; to test'},
+      {char: '时间', pinyin: 'shíjiān', meaning: 'time'},
+      {char: '书', pinyin: 'shū', meaning: 'book'},
+      {char: '舒服', pinyin: 'shūfu', meaning: 'comfortable; well'},
+      {char: '他', pinyin: 'tā', meaning: 'he; him'},
+      {char: '她', pinyin: 'tā', meaning: 'she; her'},
+      {char: '它', pinyin: 'tā', meaning: 'it'},
+      {char: '太', pinyin: 'tài', meaning: 'too'},
+      {char: '谈', pinyin: 'tán', meaning: 'to talk about'},
+      {char: '汤', pinyin: 'tāng', meaning: 'soup'},
+      {char: '腿', pinyin: 'tuǐ', meaning: 'leg'},
+      {char: '玩', pinyin: 'wán', meaning: 'to play'},
+      {char: '晚上', pinyin: 'wǎnshàng', meaning: 'evening; night'},
+      {char: '网球', pinyin: 'wǎngqiú', meaning: 'tennis'},
+      {char: '往', pinyin: 'wǎng', meaning: 'toward; to'},
+      {char: '我', pinyin: 'wǒ', meaning: 'I; me'},
+      {char: '五', pinyin: 'wǔ', meaning: 'five'},
+      {char: '西', pinyin: 'xī', meaning: 'west'},
+      {char: '喜欢', pinyin: 'xǐhuan', meaning: 'to like; to love'},
+      {char: '洗澡', pinyin: 'xǐzǎo', meaning: 'to have a bath'},
+      {char: '下课', pinyin: 'xiàkè', meaning: 'to get out of class'},
+      {char: '现在', pinyin: 'xiànzài', meaning: 'now'},
+      {char: '香蕉', pinyin: 'xiāngjiāo', meaning: 'banana'},
+      {char: '小', pinyin: 'xiǎo', meaning: 'small'},
+      {char: '谢谢', pinyin: 'xièxie', meaning: 'thank'},
+      {char: '星期', pinyin: 'xīngqī', meaning: 'week; days of the week'},
+      {char: '学生', pinyin: 'xuéshēng', meaning: 'student'},
+      {char: '学校', pinyin: 'xuéxiào', meaning: 'school'},
+      {char: '一下', pinyin: 'yíxiàr', meaning: 'once; a bit; all at once'},
+      {char: '也', pinyin: 'yě', meaning: 'also; too; either'},
+      {char: '一', pinyin: 'yī', meaning: 'one'},
+      {char: '衣服', pinyin: 'yīfu', meaning: 'clothes'},
+      {char: '医生', pinyin: 'yīshēng', meaning: 'doctor'},
+      {char: '医院', pinyin: 'yīyuàn', meaning: 'hospital'},
+      {char: '有', pinyin: 'yǒu', meaning: 'to have; possess'},
+      {char: '运动', pinyin: 'yùndòng', meaning: 'sports; to do sports'},
+      {char: '再', pinyin: 'zài', meaning: 'again; in the process of'},
+      {char: '坐', pinyin: 'zuò', meaning: 'to sit; to do; to make'},
+      {char: '做作业', pinyin: 'zuòyè', meaning: 'homework'},
+      {char: '昨天', pinyin: 'zuótiān', meaning: 'yesterday'},
+      {char: '左边', pinyin: 'zuǒbiān', meaning: 'left (side)'}
     ];
 
     // sort cards by pinyin (custom A→Z without tones)
-function normalizePinyin(p){
-  return p
-    .replace(/ā|á|ǎ|à/g,'a')
-    .replace(/ē|é|ě|è/g,'e')
-    .replace(/ī|í|ǐ|ì/g,'i')
-    .replace(/ō|ó|ǒ|ò/g,'o')
-    .replace(/ū|ú|ǔ|ù/g,'u')
-    .replace(/ǖ|ǘ|ǚ|ǜ/g,'v')
-    .replace(/ü/g,'v')
-    .toLowerCase();
-}
+    function normalizePinyin(p){
+      return p
+        .replace(/ā|á|ǎ|à/g,'a')
+        .replace(/ē|é|ě|è/g,'e')
+        .replace(/ī|í|ǐ|ì/g,'i')
+        .replace(/ō|ó|ǒ|ò/g,'o')
+        .replace(/ū|ú|ǔ|ù/g,'u')
+        .replace(/ǖ|ǘ|ǚ|ǜ/g,'v')
+        .replace(/ü/g,'v')
+        .toLowerCase();
+    }
 
-cards.sort((a,b) => normalizePinyin(a.pinyin).localeCompare(normalizePinyin(b.pinyin)));
+    cards.sort((a,b) => normalizePinyin(a.pinyin).localeCompare(normalizePinyin(b.pinyin)));
 
 
     let index = 0;
@@ -178,6 +273,34 @@ cards.sort((a,b) => normalizePinyin(a.pinyin).localeCompare(normalizePinyin(b.pi
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const flipBtn = document.getElementById('flipBtn');
+
+    // Web Speech API helpers
+    const synth = window.speechSynthesis;
+    let currentUtterance = null;
+
+    function speakChinese(text){
+      if(!synth) return; // no TTS support
+      try{
+        // cancel any speaking
+        synth.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'zh-CN';
+        // SLOWER rate for clearer pronunciation
+        u.rate = 0.7; // previously 0.95 — lowered to 0.7 per your request
+        u.pitch = 1.0;
+        // prefer a voice that matches zh-CN
+        const voices = synth.getVoices();
+        const zh = voices.find(v => /zh|chinese/i.test(v.lang) || /zh-/.test(v.lang));
+        if(zh) u.voice = zh;
+        // small pause before speaking can help clarity on some browsers
+        setTimeout(() => {
+          currentUtterance = u;
+          synth.speak(u);
+        }, 80);
+      }catch(e){
+        console.warn('TTS error', e);
+      }
+    }
 
     function render() {
       if (!cards.length) return;
@@ -193,6 +316,15 @@ cards.sort((a,b) => normalizePinyin(a.pinyin).localeCompare(normalizePinyin(b.pi
     function flip() {
       const flipped = cardEl.classList.toggle('flipped');
       cardEl.setAttribute('aria-pressed', flipped);
+      // When flipped to back (true), play pronunciation of the Chinese word
+      if(flipped){
+        const c = cards[index];
+        // prefer speaking the character(s) — TTS handles Chinese best
+        speakChinese(c.char);
+      } else {
+        // if flipping back to front, stop speaking
+        if(synth) synth.cancel();
+      }
     }
 
     prevBtn.addEventListener('click', () => {
@@ -217,6 +349,12 @@ cards.sort((a,b) => normalizePinyin(a.pinyin).localeCompare(normalizePinyin(b.pi
       if (e.key === 'ArrowRight') nextBtn.click();
       if (e.code === 'Space') { e.preventDefault(); flip(); }
     });
+
+    // Ensure voices loaded (some browsers load asynchronously)
+    if(synth){
+      // try to load voices if not present
+      synth.onvoiceschanged = () => { /* voices updated, nothing else to do */ };
+    }
 
     // initial render
     render();
