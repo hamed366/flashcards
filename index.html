@@ -1,363 +1,2673 @@
-<!doctype html>
-<html lang="fa">
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Flashcard — Single Card</title>
-  <style>
-    :root{--bg:#f3f6f9;--card:#ffffff;--accent:#2b6cb0;--muted:#666}
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
-    body{background:linear-gradient(180deg,#eef2f7 0%,var(--bg) 100%);display:flex;align-items:center;justify-content:center}
-    .wrap{display:flex;gap:24px;align-items:center}
-    button{background:transparent;border:0;padding:12px 16px;border-radius:8px;font-size:14px;cursor:pointer}
-    button:focus{outline:2px solid rgba(43,108,176,.18)}
-    .nav-btn{background:transparent;color:var(--accent);border:1px solid rgba(43,108,176,.12);} 
-    .nav-btn[disabled]{opacity:.35;cursor:not-allowed}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Vocabulary Flashcards - Complete Version</title>
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .card-container{width:420px;height:260px;perspective:1200px;display:flex;align-items:center;justify-content:center}
-    .card{width:100%;height:100%;border-radius:14px;background:var(--card);box-shadow:0 10px 30px rgba(0,0,0,.08);transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.9,.3,1);position:relative;display:flex;align-items:center;justify-content:center}
-    .card.flipped{transform:rotateY(180deg)}
-    .face{position:absolute;inset:0;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;padding:28px;box-sizing:border-box}
-    .front{font-size:96px;font-weight:700;color:#111;background:#D5F1D7;border-radius:14px;}
-    .back{transform:rotateY(180deg);display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:32px 28px;gap:24px;background:#E9F2FF;border-radius:14px;}
-    .pinyin{font-size:60px;color:var(--accent);font-weight:800;text-align:center;width:100%;}
-    .meaning{font-size:48px;color:#222;font-weight:700;text-align:center;width:100%;line-height:1.5;}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    .controls{display:flex;flex-direction:column;gap:8px;align-items:center}
-    .small{font-size:12px;color:var(--muted)}
-    .flip-btn{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:0}
-  </style>
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .info-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+
+        .card-container {
+            perspective: 1000px;
+            height: 280px;
+            position: relative;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: box-shadow 0.3s;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            transform: rotateY(180deg);
+            color: white;
+        }
+
+        .card-container:hover .card-front,
+        .card-container:hover .card-back {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .hanzi-writer-container {
+            width: 150px;
+            height: 150px;
+            position: relative;
+        }
+
+        .pinyin {
+            font-size: 1.4em;
+            color: #fff;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .meaning {
+            font-size: 1.1em;
+            color: #fff;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .audio-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.3);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .audio-indicator.playing {
+            display: block;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .stroke-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.85em;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .card-front:hover .stroke-hint {
+            opacity: 1;
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            margin-top: 50px;
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            background: #f0f0f0;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+
+            .card-container {
+                height: 220px;
+            }
+
+            .hanzi-writer-container {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1 style="position:fixed; top:12px; width:100%; text-align:center; font-size:99px; font-weight:900; margin:0;
-  font-family:'KaiTi','Kaiti SC','STKaiti','FangSong','STFangsong',serif;
-  color:#ff0000;">
-  一班
-</h1>
-  <div class="wrap">
-    <button id="prevBtn" class="nav-btn" aria-label="Previous">◀</button>
-
-    <div class="card-container">
-      <div id="card" class="card" role="button" tabindex="0" aria-pressed="false">
-        <div class="face front" id="frontFace">字</div>
-        <div class="face back" id="backFace">
-          <div class="pinyin" id="pinyin"></div>
-          <div style="width:100%;height:6px;background:#000;border-radius:3px;margin:8px 0;"></div>
-          <div class="meaning" id="meaning">English meaning goes here</div>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Complete Chinese Vocabulary Flashcards</h1>
+            <p>Click → Flip + Audio | Hover → Stroke Animation</p>
+            <div>
+                <span class="info-badge">🔊 Slow Speed Pronunciation</span>
+                <span class="info-badge">✍️ Animated Stroke Order</span>
+                <span class="info-badge">🔄 Flip on Click</span>
+            </div>
         </div>
-      </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Search vocabulary (Chinese, Pinyin, or English)...">
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="flipAllCards()">🔄 Flip All</button>
+            <button class="btn" onclick="resetAllCards()">↩️ Reset All</button>
+            <button class="btn" onclick="shuffleCards()">🎲 Shuffle</button>
+        </div>
+
+        <div class="stats">
+            <span id="cardCount">Total Cards: 0</span>
+        </div>
+
+        <div class="cards-grid" id="cardsGrid"></div>
+
+        <div class="no-results" id="noResults">
+            No results found 😔
+        </div>
     </div>
 
-    <button id="nextBtn" class="nav-btn" aria-label="Next">▶</button>
-  </div>
+    <script>
+        const writerInstances = new Map();
 
-  <div style="position:fixed;left:16px;bottom:18px;display:flex;gap:8px;align-items:center">
-    <button id="flipBtn" class="flip-btn">Flip</button>
-    <div class="small">Click card or press ← → to navigate, Space to flip</div>
-  </div>
+        // Slow speed Chinese pronunciation
+        function speakChinese(text, cardElement) {
+            const indicator = cardElement.querySelector('.audio-indicator');
+            if (indicator) {
+                indicator.classList.add('playing');
+            }
 
-  <script>
-    // Single-card data (sorted at runtime)
-    const cards = [
-      {char: '阿', pinyin: 'a', meaning: 'modal particle; oh; ah'},
-      {char: '爱', pinyin: 'ài', meaning: 'to love'},
-      {char: '爱好', pinyin: 'àihào', meaning: 'hobby; to like'},
-      {char: '安静', pinyin: 'ānjìng', meaning: 'quiet'},
-      {char: '把', pinyin: 'bǎ', meaning: 'measure word for things with a handle'},
-      {char: '爸爸', pinyin: 'bàba', meaning: 'dad'},
-      {char: '吧', pinyin: 'ba', meaning: 'modal particle (suggestion/uncertainty)'},
-      {char: '白', pinyin: 'bái', meaning: 'white'},
-      {char: '班', pinyin: 'bān', meaning: 'class'},
-      {char: '半', pinyin: 'bàn', meaning: 'half'},
-      {char: '办公室', pinyin: 'bàngōngshì', meaning: 'office'},
-      {char: '帮助', pinyin: 'bāngzhù', meaning: 'to help; assist'},
-      {char: '包子', pinyin: 'bāozi', meaning: 'steamed bun'},
-      {char: '杯子', pinyin: 'bēizi', meaning: 'cup'},
-      {char: '北', pinyin: 'běi', meaning: 'north'},
-      {char: '北方', pinyin: 'běifāng', meaning: 'northern'},
-      {char: '本', pinyin: 'běn', meaning: 'measure word for volume'},
-      {char: '比较', pinyin: 'bǐjiào', meaning: 'comparatively; relatively'},
-      {char: '比赛', pinyin: 'bǐsài', meaning: 'competition; match'},
-      {char: '笔记本', pinyin: 'bǐjìběn', meaning: 'notebook'},
-      {char: '别的', pinyin: 'biéde', meaning: 'other'},
-      {char: '宾馆', pinyin: 'bīnguǎn', meaning: 'hotel'},
-      {char: '冰箱', pinyin: 'bīngxiāng', meaning: 'refrigerator'},
-      {char: '菜', pinyin: 'cài', meaning: 'dish; food'},
-      {char: '菜单', pinyin: 'càidān', meaning: 'menu'},
-      {char: '参加', pinyin: 'cānjiā', meaning: 'to join; to attend'},
-      {char: '层', pinyin: 'céng', meaning: 'floor'},
-      {char: '茶', pinyin: 'chá', meaning: 'tea'},
-      {char: '长', pinyin: 'cháng', meaning: 'long'},
-      {char: '常常', pinyin: 'chángcháng', meaning: 'often; usually'},
-      {char: '唱歌', pinyin: 'chànggē', meaning: 'to sing'},
-      {char: '超市', pinyin: 'chāoshì', meaning: 'supermarket'},
-      {char: '炒', pinyin: 'chǎo', meaning: 'stir fry'},
-      {char: '衬衫', pinyin: 'chènshān', meaning: 'shirt'},
-      {char: '城市', pinyin: 'chéngshì', meaning: 'city'},
-      {char: '吃', pinyin: 'chī', meaning: 'to eat'},
-      {char: '吃饭', pinyin: 'chīfàn', meaning: 'to have a meal'},
-      {char: '出', pinyin: 'chū', meaning: 'to go out'},
-      {char: '出去', pinyin: 'chūqù', meaning: 'to go out'},
-      {char: '出租车', pinyin: 'chūzūchē', meaning: 'taxi'},
-      {char: '厨房', pinyin: 'chúfáng', meaning: 'kitchen'},
-      {char: '穿', pinyin: 'chuān', meaning: 'to wear'},
-      {char: '窗户', pinyin: 'chuānghu', meaning: 'window'},
-      {char: '聪明', pinyin: 'cōngmíng', meaning: 'clever; smart'},
-      {char: '从', pinyin: 'cóng', meaning: 'from'},
-      {char: '打电话', pinyin: 'dǎ diànhuà', meaning: 'to make a call'},
-      {char: '打算', pinyin: 'dǎsuàn', meaning: 'to plan; to intend'},
-      {char: '打折', pinyin: 'dǎzhé', meaning: 'to give a discount'},
-      {char: '大', pinyin: 'dà', meaning: 'big'},
-      {char: '大家', pinyin: 'dàjiā', meaning: 'everyone'},
-      {char: '带', pinyin: 'dài', meaning: 'to bring'},
-      {char: '但是', pinyin: 'dànshì', meaning: 'but; however'},
-      {char: '蛋糕', pinyin: 'dàngāo', meaning: 'cake'},
-      {char: '的', pinyin: 'de', meaning: 'particle; of'},
-      {char: '等', pinyin: 'děng', meaning: 'to wait for'},
-      {char: '弟弟', pinyin: 'dìdi', meaning: 'younger brother'},
-      {char: '地图', pinyin: 'dìtú', meaning: 'map'},
-      {char: '点', pinyin: 'diǎn', meaning: 'o\'clock; to order'},
-      {char: '电话', pinyin: 'diànhuà', meaning: 'telephone'},
-      {char: '弹钢琴', pinyin: 'tán gāngqín', meaning: 'to play piano'},
-      {char: '高兴', pinyin: 'gāoxìng', meaning: 'glad; happy'},
-      {char: '告诉', pinyin: 'gàosu', meaning: 'to tell'},
-      {char: '哥哥', pinyin: 'gēge', meaning: 'elder brother'},
-      {char: '个', pinyin: 'gè', meaning: 'general measure word'},
-      {char: '给', pinyin: 'gěi', meaning: 'to give'},
-      {char: '公交汽车', pinyin: 'gōnggòng qìchē', meaning: 'bus'},
-      {char: '工作', pinyin: 'gōngzuò', meaning: 'work; job'},
-      {char: '狗', pinyin: 'gǒu', meaning: 'dog'},
-      {char: '购物', pinyin: 'gòuwù', meaning: 'shopping; to go shopping'},
-      {char: '贵', pinyin: 'guì', meaning: 'expensive'},
-      {char: '国家', pinyin: 'guó', meaning: 'country'},
-      {char: '还', pinyin: 'hái', meaning: 'still; even more'},
-      {char: '汉语', pinyin: 'Hànyǔ', meaning: 'Chinese (language)'},
-      {char: '汉字', pinyin: 'Hànzì', meaning: 'Chinese character'},
-      {char: '好', pinyin: 'hǎo', meaning: 'good'},
-      {char: '好吃', pinyin: 'hǎochī', meaning: 'delicious'},
-      {char: '号', pinyin: 'hào', meaning: 'number; date'},
-      {char: '喝', pinyin: 'hē', meaning: 'to drink'},
-      {char: '黑板', pinyin: 'hēibǎn', meaning: 'blackboard'},
-      {char: '很', pinyin: 'hěn', meaning: 'very'},
-      {char: '红', pinyin: 'hóng', meaning: 'red'},
-      {char: '鸡蛋', pinyin: 'jīdàn', meaning: 'egg'},
-      {char: '几', pinyin: 'jǐ', meaning: 'how many; how much'},
-      {char: '家', pinyin: 'jiā', meaning: 'home; family'},
-      {char: '家具', pinyin: 'jiājù', meaning: 'furniture'},
-      {char: '价格', pinyin: 'jiàgé', meaning: 'price'},
-      {char: '检查', pinyin: 'jiǎnchá', meaning: 'to check'},
-      {char: '见', pinyin: 'jiàn', meaning: 'to meet; to see'},
-      {char: '叫', pinyin: 'jiào', meaning: 'to be called'},
-      {char: '教', pinyin: 'jiāo', meaning: 'to teach'},
-      {char: '教室', pinyin: 'jiàoshì', meaning: 'classroom'},
-      {char: '介绍', pinyin: 'jièshào', meaning: 'to introduce'},
-      {char: '看', pinyin: 'kàn', meaning: 'to watch; to look; to see'},
-      {char: '开始', pinyin: 'kāishǐ', meaning: 'to begin; to start'},
-      {char: '考', pinyin: 'kǎo', meaning: 'to test; to take an exam'},
-      {char: '可以', pinyin: 'kěyǐ', meaning: 'can; may'},
-      {char: '客人', pinyin: 'kèrén', meaning: 'guest'},
-      {char: '空调', pinyin: 'kōngtiáo', meaning: 'air-conditioner'},
-      {char: '快', pinyin: 'kuài', meaning: 'fast; quickly'},
-      {char: '快乐', pinyin: 'kuàilè', meaning: 'happy'},
-      {char: '老师', pinyin: 'lǎoshī', meaning: 'teacher'},
-      {char: '了', pinyin: 'le', meaning: 'modal particle indicating change / completed action'},
-      {char: '冷', pinyin: 'lěng', meaning: 'cold'},
-      {char: '里', pinyin: 'lǐ', meaning: 'inside'},
-      {char: '两', pinyin: 'liǎng', meaning: 'two'},
-      {char: '零', pinyin: 'líng', meaning: 'zero'},
-      {char: '六', pinyin: 'liù', meaning: 'six'},
-      {char: '楼', pinyin: 'lóu', meaning: 'building; floor'},
-      {char: '妈妈', pinyin: 'māma', meaning: 'mum'},
-      {char: '马上', pinyin: 'mǎshàng', meaning: 'immediately; at once'},
-      {char: '买', pinyin: 'mǎi', meaning: 'to buy'},
-      {char: '卖', pinyin: 'mài', meaning: 'to sell'},
-      {char: '猫', pinyin: 'māo', meaning: 'cat'},
-      {char: '没有', pinyin: 'méiyǒu', meaning: 'have not'},
-      {char: '每', pinyin: 'měi', meaning: 'every; each'},
-      {char: '名字', pinyin: 'míngzi', meaning: 'name'},
-      {char: '哪', pinyin: 'nǎ', meaning: 'which'},
-      {char: '哪儿', pinyin: 'nǎr', meaning: 'where'},
-      {char: '男', pinyin: 'nán', meaning: 'male; man'},
-      {char: '南', pinyin: 'nán', meaning: 'south'},
-      {char: '难', pinyin: 'nán', meaning: 'difficult; hard'},
-      {char: '难受', pinyin: 'nánshòu', meaning: 'feel unwell'},
-      {char: '呢', pinyin: 'ne', meaning: 'modal particle'},
-      {char: '你', pinyin: 'nǐ', meaning: 'you (singular)'},
-      {char: '你们', pinyin: 'nǐmen', meaning: 'you (plural)'},
-      {char: '区', pinyin: 'qū', meaning: 'area; district'},
-      {char: '起床', pinyin: 'qǐchuáng', meaning: 'to get up'},
-      {char: '钱', pinyin: 'qián', meaning: 'money'},
-      {char: '前面', pinyin: 'qiánmiàn', meaning: 'in front'},
-      {char: '请', pinyin: 'qǐng', meaning: 'please; to invite'},
-      {char: '去', pinyin: 'qù', meaning: 'to go; to leave'},
-      {char: '热', pinyin: 'rè', meaning: 'hot'},
-      {char: '人', pinyin: 'rén', meaning: 'person; people'},
-      {char: '认识', pinyin: 'rènshi', meaning: 'to know'},
-      {char: '三', pinyin: 'sān', meaning: 'three'},
-      {char: '商店', pinyin: 'shāngdiàn', meaning: 'store; shop'},
-      {char: '上课', pinyin: 'shàngkè', meaning: 'to go to class; to attend class'},
-      {char: '上网', pinyin: 'shàngwǎng', meaning: 'to be on the Internet'},
-      {char: '上午', pinyin: 'shàngwǔ', meaning: 'forenoon'},
-      {char: '少', pinyin: 'shǎo', meaning: 'few; little'},
-      {char: '谁', pinyin: 'shéi', meaning: 'who'},
-      {char: '身体', pinyin: 'shēntǐ', meaning: 'body'},
-      {char: '生病', pinyin: 'shēngbìng', meaning: 'to be sick'},
-      {char: '生活', pinyin: 'shēnghuó', meaning: 'life'},
-      {char: '生日', pinyin: 'shēngrì', meaning: 'birthday'},
-      {char: '事情', pinyin: 'shìqing', meaning: 'thing; matter'},
-      {char: '试', pinyin: 'shì', meaning: 'to try; to test'},
-      {char: '时间', pinyin: 'shíjiān', meaning: 'time'},
-      {char: '书', pinyin: 'shū', meaning: 'book'},
-      {char: '舒服', pinyin: 'shūfu', meaning: 'comfortable; well'},
-      {char: '他', pinyin: 'tā', meaning: 'he; him'},
-      {char: '她', pinyin: 'tā', meaning: 'she; her'},
-      {char: '它', pinyin: 'tā', meaning: 'it'},
-      {char: '太', pinyin: 'tài', meaning: 'too'},
-      {char: '谈', pinyin: 'tán', meaning: 'to talk about'},
-      {char: '汤', pinyin: 'tāng', meaning: 'soup'},
-      {char: '腿', pinyin: 'tuǐ', meaning: 'leg'},
-      {char: '玩', pinyin: 'wán', meaning: 'to play'},
-      {char: '晚上', pinyin: 'wǎnshàng', meaning: 'evening; night'},
-      {char: '网球', pinyin: 'wǎngqiú', meaning: 'tennis'},
-      {char: '往', pinyin: 'wǎng', meaning: 'toward; to'},
-      {char: '我', pinyin: 'wǒ', meaning: 'I; me'},
-      {char: '五', pinyin: 'wǔ', meaning: 'five'},
-      {char: '西', pinyin: 'xī', meaning: 'west'},
-      {char: '喜欢', pinyin: 'xǐhuan', meaning: 'to like; to love'},
-      {char: '洗澡', pinyin: 'xǐzǎo', meaning: 'to have a bath'},
-      {char: '下课', pinyin: 'xiàkè', meaning: 'to get out of class'},
-      {char: '现在', pinyin: 'xiànzài', meaning: 'now'},
-      {char: '香蕉', pinyin: 'xiāngjiāo', meaning: 'banana'},
-      {char: '小', pinyin: 'xiǎo', meaning: 'small'},
-      {char: '谢谢', pinyin: 'xièxie', meaning: 'thank'},
-      {char: '星期', pinyin: 'xīngqī', meaning: 'week; days of the week'},
-      {char: '学生', pinyin: 'xuéshēng', meaning: 'student'},
-      {char: '学校', pinyin: 'xuéxiào', meaning: 'school'},
-      {char: '一下', pinyin: 'yíxiàr', meaning: 'once; a bit; all at once'},
-      {char: '也', pinyin: 'yě', meaning: 'also; too; either'},
-      {char: '一', pinyin: 'yī', meaning: 'one'},
-      {char: '衣服', pinyin: 'yīfu', meaning: 'clothes'},
-      {char: '医生', pinyin: 'yīshēng', meaning: 'doctor'},
-      {char: '医院', pinyin: 'yīyuàn', meaning: 'hospital'},
-      {char: '有', pinyin: 'yǒu', meaning: 'to have; possess'},
-      {char: '运动', pinyin: 'yùndòng', meaning: 'sports; to do sports'},
-      {char: '再', pinyin: 'zài', meaning: 'again; in the process of'},
-      {char: '坐', pinyin: 'zuò', meaning: 'to sit; to do; to make'},
-      {char: '做作业', pinyin: 'zuòyè', meaning: 'homework'},
-      {char: '昨天', pinyin: 'zuótiān', meaning: 'yesterday'},
-      {char: '左边', pinyin: 'zuǒbiān', meaning: 'left (side)'}
-    ];
+            window.speechSynthesis.cancel();
 
-    // sort cards by pinyin (custom A→Z without tones)
-    function normalizePinyin(p){
-      return p
-        .replace(/ā|á|ǎ|à/g,'a')
-        .replace(/ē|é|ě|è/g,'e')
-        .replace(/ī|í|ǐ|ì/g,'i')
-        .replace(/ō|ó|ǒ|ò/g,'o')
-        .replace(/ū|ú|ǔ|ù/g,'u')
-        .replace(/ǖ|ǘ|ǚ|ǜ/g,'v')
-        .replace(/ü/g,'v')
-        .toLowerCase();
-    }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 0.6; // Slow speed
+            utterance.pitch = 1;
+            utterance.volume = 1;
 
-    cards.sort((a,b) => normalizePinyin(a.pinyin).localeCompare(normalizePinyin(b.pinyin)));
+            utterance.onend = () => {
+                if (indicator) {
+                    indicator.classList.remove('playing');
+                }
+            };
 
+            utterance.onerror = () => {
+                if (indicator) {
+                    indicator.classList.remove('playing');
+                }
+                console.log('Audio playback error');
+            };
 
-    let index = 0;
-    const cardEl = document.getElementById('card');
-    const frontFace = document.getElementById('frontFace');
-    const backFace = document.getElementById('backFace');
-    const pinyinEl = document.getElementById('pinyin');
-    const meaningEl = document.getElementById('meaning');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const flipBtn = document.getElementById('flipBtn');
+            setTimeout(() => {
+                window.speechSynthesis.speak(utterance);
+            }, 100);
+        }
 
-    // Web Speech API helpers
-    const synth = window.speechSynthesis;
-    let currentUtterance = null;
+        // Create HanziWriter
+        function createHanziWriter(containerId, character) {
+            const writer = HanziWriter.create(containerId, character, {
+                width: 150,
+                height: 150,
+                padding: 5,
+                strokeAnimationSpeed: 2,
+                delayBetweenStrokes: 100,
+                showOutline: true,
+                showCharacter: true,
+                strokeColor: '#333',
+                radicalColor: '#168'
+            });
 
-    function speakChinese(text){
-      if(!synth) return; // no TTS support
-      try{
-        // cancel any speaking
-        synth.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'zh-CN';
-        // SLOWER rate for clearer pronunciation
-        u.rate = 0.7; // previously 0.95 — lowered to 0.7 per your request
-        u.pitch = 1.0;
-        // prefer a voice that matches zh-CN
-        const voices = synth.getVoices();
-        const zh = voices.find(v => /zh|chinese/i.test(v.lang) || /zh-/.test(v.lang));
-        if(zh) u.voice = zh;
-        // small pause before speaking can help clarity on some browsers
-        setTimeout(() => {
-          currentUtterance = u;
-          synth.speak(u);
-        }, 80);
-      }catch(e){
-        console.warn('TTS error', e);
-      }
-    }
+            return writer;
+        }
 
-    function render() {
-      if (!cards.length) return;
-      const c = cards[index];
-      frontFace.textContent = c.char;
-      pinyinEl.textContent = c.pinyin;
-      meaningEl.textContent = c.meaning;
-      prevBtn.disabled = false;
-      nextBtn.disabled = false;
-      cardEl.classList.remove('flipped');
-    }
+        // All vocabulary data - 434 words
+        const vocabulary = [
+  {
+    "char": "照片",
+    "pinyin": "zhàopiàn(n.)",
+    "meaning": "picture; photo"
+  },
+  {
+    "char": "这",
+    "pinyin": "zhè(pron.)",
+    "meaning": "this"
+  },
+  {
+    "char": "这么",
+    "pinyin": "zhème(pron.)",
+    "meaning": "so; this way; like this"
+  },
+  {
+    "char": "真",
+    "pinyin": "zhēn(adv.)",
+    "meaning": "really"
+  },
+  {
+    "char": "正常",
+    "pinyin": "zhèngcháng(adj.)",
+    "meaning": "normal"
+  },
+  {
+    "char": "只",
+    "pinyin": "zhǐ(adv.)",
+    "meaning": "only; just"
+  },
+  {
+    "char": "知道",
+    "pinyin": "zhīdào(v.)",
+    "meaning": "to know"
+  },
+  {
+    "char": "中间",
+    "pinyin": "zhōngjiān(n.)",
+    "meaning": "in the middle"
+  },
+  {
+    "char": "中午",
+    "pinyin": "zhōngwǔ(n.)",
+    "meaning": "noon; midday"
+  },
+  {
+    "char": "种",
+    "pinyin": "zhǒng(nm.)",
+    "meaning": "kind"
+  },
+  {
+    "char": "周末",
+    "pinyin": "zhōumò(n.)",
+    "meaning": "weekend"
+  },
+  {
+    "char": "猪",
+    "pinyin": "zhū(n.)",
+    "meaning": "pig"
+  },
+  {
+    "char": "猪肉",
+    "pinyin": "zhūròu(n.)",
+    "meaning": "pork"
+  },
+  {
+    "char": "主食",
+    "pinyin": "zhǔshí(n.)",
+    "meaning": "the principal food"
+  },
+  {
+    "char": "住",
+    "pinyin": "zhù(v.)",
+    "meaning": "to live (in)"
+  },
+  {
+    "char": "祝",
+    "pinyin": "zhù(v.)",
+    "meaning": "wish"
+  },
+  {
+    "char": "专业",
+    "pinyin": "zhuānyè(n.)",
+    "meaning": "major; specialty"
+  },
+  {
+    "char": "准备",
+    "pinyin": "zhǔnbèi(v.)",
+    "meaning": "to prepare; to get ready"
+  },
+  {
+    "char": "桌子",
+    "pinyin": "zhuōzi(n.)",
+    "meaning": "table"
+  },
+  {
+    "char": "自己",
+    "pinyin": "zìjǐ(pron.)",
+    "meaning": "oneself; own"
+  },
+  {
+    "char": "走",
+    "pinyin": "zǒu(v.)",
+    "meaning": "to walk; to go; to leave"
+  },
+  {
+    "char": "足球",
+    "pinyin": "zúqiú(n.)",
+    "meaning": "soccer"
+  },
+  {
+    "char": "最近",
+    "pinyin": "zuìjìn(n.)",
+    "meaning": "recently; soon"
+  },
+  {
+    "char": "昨天",
+    "pinyin": "zuótiān(n.)",
+    "meaning": "yesterday"
+  },
+  {
+    "char": "左边",
+    "pinyin": "zuǒbiān(n.)",
+    "meaning": "left (side)"
+  },
+  {
+    "char": "坐",
+    "pinyin": "zuò(v.)",
+    "meaning": "to sit"
+  },
+  {
+    "char": "做",
+    "pinyin": "zuò(v.)",
+    "meaning": "to do; to make"
+  },
+  {
+    "char": "做饭",
+    "pinyin": "zuò fàn",
+    "meaning": "cook"
+  },
+  {
+    "char": "作业",
+    "pinyin": "zuòyè(n.)",
+    "meaning": "homework"
+  },
+  {
+    "char": "体育馆",
+    "pinyin": "tǐyùguǎn(n.)",
+    "meaning": "gym"
+  },
+  {
+    "char": "天气",
+    "pinyin": "tiānqì(n.)",
+    "meaning": "weather"
+  },
+  {
+    "char": "甜",
+    "pinyin": "tián(adj.)",
+    "meaning": "sweet"
+  },
+  {
+    "char": "条",
+    "pinyin": "tiáo(nm.)",
+    "meaning": "a pair of(trousers)"
+  },
+  {
+    "char": "跳舞",
+    "pinyin": "tiàowǔ(sv.)",
+    "meaning": "to dance"
+  },
+  {
+    "char": "听说",
+    "pinyin": "tīngshuō(v.)",
+    "meaning": "hear"
+  },
+  {
+    "char": "同学",
+    "pinyin": "tóngxué(n.)",
+    "meaning": "classmate"
+  },
+  {
+    "char": "头疼",
+    "pinyin": "tóuténg",
+    "meaning": "headache"
+  },
+  {
+    "char": "图书馆",
+    "pinyin": "túshūguǎn(n.)",
+    "meaning": "library"
+  },
+  {
+    "char": "玩",
+    "pinyin": "wán(v.)",
+    "meaning": "to play"
+  },
+  {
+    "char": "碗",
+    "pinyin": "wǎn(n./nm.)",
+    "meaning": "bowl"
+  },
+  {
+    "char": "晚饭",
+    "pinyin": "wǎnfàn(n.)",
+    "meaning": "dinner; supper"
+  },
+  {
+    "char": "晚会",
+    "pinyin": "wǎnhuì(n.)",
+    "meaning": "party"
+  },
+  {
+    "char": "晚上",
+    "pinyin": "wǎnshàng(n.)",
+    "meaning": "evening"
+  },
+  {
+    "char": "网球",
+    "pinyin": "wǎngqiú(n.)",
+    "meaning": "tennis"
+  },
+  {
+    "char": "往",
+    "pinyin": "wǎng(prep.)",
+    "meaning": "to; toward"
+  },
+  {
+    "char": "位",
+    "pinyin": "wèi(nm.)",
+    "meaning": "a measure word used before people"
+  },
+  {
+    "char": "味道",
+    "pinyin": "wèidào(n.)",
+    "meaning": "flavor"
+  },
+  {
+    "char": "问",
+    "pinyin": "wèn(v.)",
+    "meaning": "to ask"
+  },
+  {
+    "char": "我",
+    "pinyin": "wǒ(pron.)",
+    "meaning": "I; me"
+  },
+  {
+    "char": "五",
+    "pinyin": "wǔ(num.)",
+    "meaning": "five"
+  },
+  {
+    "char": "西",
+    "pinyin": "xī(n.)",
+    "meaning": "west"
+  },
+  {
+    "char": "西瓜",
+    "pinyin": "xīguā(n.)",
+    "meaning": "watermelon"
+  },
+  {
+    "char": "西红柿",
+    "pinyin": "xīhóngshì(n.)",
+    "meaning": "tomato"
+  },
+  {
+    "char": "习惯",
+    "pinyin": "xíguàn(n./v.)",
+    "meaning": "habit; get used to"
+  },
+  {
+    "char": "喜欢",
+    "pinyin": "xǐhuan(v.)",
+    "meaning": "to like; to love"
+  },
+  {
+    "char": "洗澡",
+    "pinyin": "xǐzǎo(sv.)",
+    "meaning": "to have a bath"
+  },
+  {
+    "char": "爬",
+    "pinyin": "pá(v.)",
+    "meaning": "climb"
+  },
+  {
+    "char": "盘子",
+    "pinyin": "pánzi(n.)",
+    "meaning": "tray"
+  },
+  {
+    "char": "旁边",
+    "pinyin": "pángbiān(n.)",
+    "meaning": "beside"
+  },
+  {
+    "char": "跑步",
+    "pinyin": "pǎobù(sv.)",
+    "meaning": "to run"
+  },
+  {
+    "char": "陪",
+    "pinyin": "péi(v.)",
+    "meaning": "to accompany"
+  },
+  {
+    "char": "朋友",
+    "pinyin": "péngyou(n.)",
+    "meaning": "friend"
+  },
+  {
+    "char": "便宜",
+    "pinyin": "piányi(adj.)",
+    "meaning": "cheap"
+  },
+  {
+    "char": "皮肤",
+    "pinyin": "pífū(n.)",
+    "meaning": "skin"
+  },
+  {
+    "char": "啤酒",
+    "pinyin": "píjiǔ(n.)",
+    "meaning": "beer"
+  },
+  {
+    "char": "漂亮",
+    "pinyin": "piàoliang(adj.)",
+    "meaning": "beautiful"
+  },
+  {
+    "char": "乒乓球",
+    "pinyin": "pīngpāngqiú(n.)",
+    "meaning": "table tennis"
+  },
+  {
+    "char": "瓶",
+    "pinyin": "píng(nm.)",
+    "meaning": "bottle"
+  },
+  {
+    "char": "苹果",
+    "pinyin": "píngguǒ(n.)",
+    "meaning": "apple"
+  },
+  {
+    "char": "葡萄",
+    "pinyin": "pútao(n.)",
+    "meaning": "grape"
+  },
+  {
+    "char": "普通",
+    "pinyin": "pǔtōng(adj.)",
+    "meaning": "common"
+  },
+  {
+    "char": "起床",
+    "pinyin": "qǐchuáng(v.)",
+    "meaning": "to get up"
+  },
+  {
+    "char": "钱",
+    "pinyin": "qián(n.)",
+    "meaning": "money"
+  },
+  {
+    "char": "前面",
+    "pinyin": "qiánmiàn(n.)",
+    "meaning": "in front"
+  },
+  {
+    "char": "墙",
+    "pinyin": "qiáng(n.)",
+    "meaning": "wall"
+  },
+  {
+    "char": "晴天",
+    "pinyin": "qíng tiān(n.)",
+    "meaning": "sunny day"
+  },
+  {
+    "char": "请",
+    "pinyin": "qǐng(v.)",
+    "meaning": "please"
+  },
+  {
+    "char": "请假",
+    "pinyin": "qǐngjià(sv.)",
+    "meaning": "to ask for leave"
+  },
+  {
+    "char": "去",
+    "pinyin": "qù(v.)",
+    "meaning": "to go; to leave"
+  },
+  {
+    "char": "全",
+    "pinyin": "quán(adj./adv.)",
+    "meaning": "whole; all"
+  },
+  {
+    "char": "裙子",
+    "pinyin": "qúnzi(n.)",
+    "meaning": "skirt; dress"
+  },
+  {
+    "char": "热",
+    "pinyin": "rè(adj.)",
+    "meaning": "hot"
+  },
+  {
+    "char": "热闹",
+    "pinyin": "rènao(adj.)",
+    "meaning": "buzzing with excitement"
+  },
+  {
+    "char": "人",
+    "pinyin": "rén(n.)",
+    "meaning": "people; person"
+  },
+  {
+    "char": "钢琴",
+    "pinyin": "gāngqín(n.)",
+    "meaning": "piano"
+  },
+  {
+    "char": "高兴",
+    "pinyin": "gāoxìng(adj.)",
+    "meaning": "glad"
+  },
+  {
+    "char": "告诉",
+    "pinyin": "gàosu(v.)",
+    "meaning": "to tell"
+  },
+  {
+    "char": "哥哥",
+    "pinyin": "gēge(n.)",
+    "meaning": "elder brother"
+  },
+  {
+    "char": "个",
+    "pinyin": "gè(nm.)",
+    "meaning": "a general measure word"
+  },
+  {
+    "char": "给",
+    "pinyin": "gěi(v.)",
+    "meaning": "to give"
+  },
+  {
+    "char": "公共汽车",
+    "pinyin": "gōnggòng qìchē(n.)",
+    "meaning": "bus"
+  },
+  {
+    "char": "工作",
+    "pinyin": "gōngzuò(v./n.)",
+    "meaning": "work; job"
+  },
+  {
+    "char": "狗",
+    "pinyin": "gǒu(n.)",
+    "meaning": "dog"
+  },
+  {
+    "char": "购物",
+    "pinyin": "gòuwù(v.)",
+    "meaning": "shopping"
+  },
+  {
+    "char": "顾客",
+    "pinyin": "gùkè(n.)",
+    "meaning": "customer"
+  },
+  {
+    "char": "逛",
+    "pinyin": "guàng(v.)",
+    "meaning": "to stroll"
+  },
+  {
+    "char": "贵",
+    "pinyin": "guì(adj.)",
+    "meaning": "expensive"
+  },
+  {
+    "char": "贵姓",
+    "pinyin": "guìxìng",
+    "meaning": "surname (polite)"
+  },
+  {
+    "char": "国",
+    "pinyin": "guó(n.)",
+    "meaning": "country"
+  },
+  {
+    "char": "果汁",
+    "pinyin": "guǒzhī(n.)",
+    "meaning": "fruit juice"
+  },
+  {
+    "char": "过",
+    "pinyin": "guò(v.)",
+    "meaning": "to spend(time)"
+  },
+  {
+    "char": "还",
+    "pinyin": "hái(adv.)",
+    "meaning": "still; even more"
+  },
+  {
+    "char": "汉语",
+    "pinyin": "Hànyǔ(n.)",
+    "meaning": "Chinese(language)"
+  },
+  {
+    "char": "汉字",
+    "pinyin": "Hànzì(n.)",
+    "meaning": "Chinese character"
+  },
+  {
+    "char": "好",
+    "pinyin": "hǎo(adj.)",
+    "meaning": "good"
+  },
+  {
+    "char": "好吃",
+    "pinyin": "hǎo chī(adj.)",
+    "meaning": "delicious"
+  },
+  {
+    "char": "好喝",
+    "pinyin": "hǎo hē(adj.)",
+    "meaning": "good-tasting"
+  },
+  {
+    "char": "好看",
+    "pinyin": "hǎokàn(adj.)",
+    "meaning": "nice; good-looking"
+  },
+  {
+    "char": "号",
+    "pinyin": "hào(nm.)",
+    "meaning": "number/No."
+  },
+  {
+    "char": "号码",
+    "pinyin": "hàomǎ(n.)",
+    "meaning": "number"
+  },
+  {
+    "char": "喝",
+    "pinyin": "hē(v.)",
+    "meaning": "to drink"
+  },
+  {
+    "char": "合适",
+    "pinyin": "héshì(adj.)",
+    "meaning": "suitable"
+  },
+  {
+    "char": "和",
+    "pinyin": "hé(conj.)",
+    "meaning": "and"
+  },
+  {
+    "char": "老师",
+    "pinyin": "lǎoshī(n.)",
+    "meaning": "teacher"
+  },
+  {
+    "char": "了",
+    "pinyin": "le(mp.)",
+    "meaning": "particle (change of status)"
+  },
+  {
+    "char": "累",
+    "pinyin": "lèi(adj.)",
+    "meaning": "tired"
+  },
+  {
+    "char": "冷",
+    "pinyin": "lěng(adj.)",
+    "meaning": "cold"
+  },
+  {
+    "char": "离",
+    "pinyin": "lí(prep.)",
+    "meaning": "from"
+  },
+  {
+    "char": "里面",
+    "pinyin": "lǐmiàn(n.)",
+    "meaning": "inside"
+  },
+  {
+    "char": "礼物",
+    "pinyin": "lǐwù(n.)",
+    "meaning": "gift; present"
+  },
+  {
+    "char": "力气",
+    "pinyin": "lìqi(n.)",
+    "meaning": "physical strength"
+  },
+  {
+    "char": "历史",
+    "pinyin": "lìshǐ(n.)",
+    "meaning": "history"
+  },
+  {
+    "char": "例如",
+    "pinyin": "lìrú(v.)",
+    "meaning": "for example"
+  },
+  {
+    "char": "两",
+    "pinyin": "liǎng(num.)",
+    "meaning": "two"
+  },
+  {
+    "char": "聊天儿",
+    "pinyin": "liáo tiānr(sv.)",
+    "meaning": "to chat"
+  },
+  {
+    "char": "零",
+    "pinyin": "líng(num.)",
+    "meaning": "zero"
+  },
+  {
+    "char": "另",
+    "pinyin": "lìng(adv.)",
+    "meaning": "other; another"
+  },
+  {
+    "char": "留学",
+    "pinyin": "liúxué(v.)",
+    "meaning": "study abroad"
+  },
+  {
+    "char": "留学生",
+    "pinyin": "liúxuéshēng(n.)",
+    "meaning": "international student"
+  },
+  {
+    "char": "流行",
+    "pinyin": "liúxíng(adj.)",
+    "meaning": "popular"
+  },
+  {
+    "char": "六",
+    "pinyin": "liù(num.)",
+    "meaning": "six"
+  },
+  {
+    "char": "楼",
+    "pinyin": "lóu(n.)",
+    "meaning": "building; floor"
+  },
+  {
+    "char": "妈妈",
+    "pinyin": "māma(n.)",
+    "meaning": "mum"
+  },
+  {
+    "char": "马",
+    "pinyin": "mǎ(n.)",
+    "meaning": "horse"
+  },
+  {
+    "char": "马上",
+    "pinyin": "mǎshàng(adv.)",
+    "meaning": "immediately"
+  },
+  {
+    "char": "吗",
+    "pinyin": "ma(mp.)",
+    "meaning": "question particle"
+  },
+  {
+    "char": "买",
+    "pinyin": "mǎi(v.)",
+    "meaning": "to buy"
+  },
+  {
+    "char": "卖",
+    "pinyin": "mài(v.)",
+    "meaning": "to sell"
+  },
+  {
+    "char": "忙",
+    "pinyin": "máng(adj.)",
+    "meaning": "busy"
+  },
+  {
+    "char": "猫",
+    "pinyin": "māo(n.)",
+    "meaning": "cat"
+  },
+  {
+    "char": "没有",
+    "pinyin": "méiyǒu(v.)",
+    "meaning": "have not"
+  },
+  {
+    "char": "每",
+    "pinyin": "měi(pron.)",
+    "meaning": "every; each"
+  },
+  {
+    "char": "妹妹",
+    "pinyin": "mèimei(n.)",
+    "meaning": "younger sister"
+  },
+  {
+    "char": "门",
+    "pinyin": "mén(n.)",
+    "meaning": "door"
+  },
+  {
+    "char": "门口",
+    "pinyin": "ménkǒu(n.)",
+    "meaning": "entrance; gate"
+  },
+  {
+    "char": "米",
+    "pinyin": "mǐ(n.)",
+    "meaning": "rice(raw)"
+  },
+  {
+    "char": "米饭",
+    "pinyin": "mǐfàn(n.)",
+    "meaning": "rice (cooked)"
+  },
+  {
+    "char": "面包",
+    "pinyin": "miànbāo(n.)",
+    "meaning": "bread"
+  },
+  {
+    "char": "面条",
+    "pinyin": "miàntiáo(n.)",
+    "meaning": "noodle"
+  },
+  {
+    "char": "明天",
+    "pinyin": "míngtiān(n.)",
+    "meaning": "tomorrow"
+  },
+  {
+    "char": "名字",
+    "pinyin": "míngzi(n.)",
+    "meaning": "name"
+  },
+  {
+    "char": "哪",
+    "pinyin": "nǎ(pron.)",
+    "meaning": "which"
+  },
+  {
+    "char": "哪儿",
+    "pinyin": "nǎr(pron.)",
+    "meaning": "where"
+  },
+  {
+    "char": "男",
+    "pinyin": "nán(adj.)",
+    "meaning": "male; man"
+  },
+  {
+    "char": "南",
+    "pinyin": "nán(n.)",
+    "meaning": "south"
+  },
+  {
+    "char": "难",
+    "pinyin": "nán(adj.)",
+    "meaning": "difficult; hard"
+  },
+  {
+    "char": "难受",
+    "pinyin": "nánshòu(adj.)",
+    "meaning": "feel unwell"
+  },
+  {
+    "char": "呢",
+    "pinyin": "ne(mp.)",
+    "meaning": "question particle"
+  },
+  {
+    "char": "你",
+    "pinyin": "nǐ(pron.)",
+    "meaning": "you (singular)"
+  },
+  {
+    "char": "你们",
+    "pinyin": "nǐmen(pron.)",
+    "meaning": "you (plural)"
+  },
+  {
+    "char": "年",
+    "pinyin": "nián(n.)",
+    "meaning": "year"
+  },
+  {
+    "char": "您",
+    "pinyin": "nín(pron.)",
+    "meaning": "you(polite)"
+  },
+  {
+    "char": "牛奶",
+    "pinyin": "niúnǎi(n.)",
+    "meaning": "milk"
+  },
+  {
+    "char": "牛肉",
+    "pinyin": "niúròu(n.)",
+    "meaning": "beef"
+  },
+  {
+    "char": "女",
+    "pinyin": "nǚ(adj.)",
+    "meaning": "female; woman"
+  },
+  {
+    "char": "近",
+    "pinyin": "jìn(adj.)",
+    "meaning": "near"
+  },
+  {
+    "char": "经常",
+    "pinyin": "jīngcháng(adv.)",
+    "meaning": "often"
+  },
+  {
+    "char": "京剧",
+    "pinyin": "jīngjù(n.)",
+    "meaning": "Beijing Opera"
+  },
+  {
+    "char": "举行",
+    "pinyin": "jǔxíng(v.)",
+    "meaning": "to hold(meeting)"
+  },
+  {
+    "char": "觉得",
+    "pinyin": "juéde(v.)",
+    "meaning": "to feel; to think"
+  },
+  {
+    "char": "咖啡",
+    "pinyin": "kāfēi(n.)",
+    "meaning": "coffee"
+  },
+  {
+    "char": "开",
+    "pinyin": "kāi(v.)",
+    "meaning": "to open"
+  },
+  {
+    "char": "开始",
+    "pinyin": "kāishǐ(v.)",
+    "meaning": "to begin; to start"
+  },
+  {
+    "char": "看",
+    "pinyin": "kàn(v.)",
+    "meaning": "to watch; to look"
+  },
+  {
+    "char": "看病",
+    "pinyin": "kànbìng",
+    "meaning": "to see a doctor"
+  },
+  {
+    "char": "咳嗽",
+    "pinyin": "késou(v.)",
+    "meaning": "cough"
+  },
+  {
+    "char": "可爱",
+    "pinyin": "kě'ài(adj.)",
+    "meaning": "cute"
+  },
+  {
+    "char": "可以",
+    "pinyin": "kěyǐ(aux.)",
+    "meaning": "can; may"
+  },
+  {
+    "char": "课",
+    "pinyin": "kè(n.)",
+    "meaning": "class"
+  },
+  {
+    "char": "刻",
+    "pinyin": "kè(n.)",
+    "meaning": "a quarter(of hour)"
+  },
+  {
+    "char": "客人",
+    "pinyin": "kèrén(n.)",
+    "meaning": "guest"
+  },
+  {
+    "char": "空调",
+    "pinyin": "kōngtiáo(n.)",
+    "meaning": "air-conditioner"
+  },
+  {
+    "char": "口",
+    "pinyin": "kǒu(nm.)",
+    "meaning": "measure word"
+  },
+  {
+    "char": "苦",
+    "pinyin": "kǔ(adj.)",
+    "meaning": "bitter"
+  },
+  {
+    "char": "裤子",
+    "pinyin": "kùzi(n.)",
+    "meaning": "trousers; pants"
+  },
+  {
+    "char": "块",
+    "pinyin": "kuài(nm.)",
+    "meaning": "kuai (currency)"
+  },
+  {
+    "char": "快",
+    "pinyin": "kuài(adj.)",
+    "meaning": "fast; quickly"
+  },
+  {
+    "char": "快乐",
+    "pinyin": "kuàilè(adj.)",
+    "meaning": "happy"
+  },
+  {
+    "char": "辣",
+    "pinyin": "là(adj.)",
+    "meaning": "spicy"
+  },
+  {
+    "char": "来",
+    "pinyin": "lái(v.)",
+    "meaning": "to let; to come"
+  },
+  {
+    "char": "篮球",
+    "pinyin": "lánqiú(n.)",
+    "meaning": "basketball"
+  },
+  {
+    "char": "老虎",
+    "pinyin": "lǎohǔ(n.)",
+    "meaning": "tiger"
+  },
+  {
+    "char": "售货员",
+    "pinyin": "shòuhuòyuán(n.)",
+    "meaning": "shop assistant"
+  },
+  {
+    "char": "书",
+    "pinyin": "shū(n.)",
+    "meaning": "book"
+  },
+  {
+    "char": "书店",
+    "pinyin": "shūdiàn(n.)",
+    "meaning": "bookstore"
+  },
+  {
+    "char": "书房",
+    "pinyin": "shūfáng(n.)",
+    "meaning": "study"
+  },
+  {
+    "char": "舒服",
+    "pinyin": "shūfu(adj.)",
+    "meaning": "comfortable"
+  },
+  {
+    "char": "刷",
+    "pinyin": "shuā(v.)",
+    "meaning": "swipe(a card)"
+  },
+  {
+    "char": "水",
+    "pinyin": "shuǐ(n.)",
+    "meaning": "water"
+  },
+  {
+    "char": "水果",
+    "pinyin": "shuǐguǒ(n.)",
+    "meaning": "fruit"
+  },
+  {
+    "char": "水果店",
+    "pinyin": "shuǐguǒ diàn(n.)",
+    "meaning": "fruit shop"
+  },
+  {
+    "char": "睡觉",
+    "pinyin": "shuìjiào(sv.)",
+    "meaning": "to go to sleep"
+  },
+  {
+    "char": "说",
+    "pinyin": "shuō(v.)",
+    "meaning": "speak"
+  },
+  {
+    "char": "送",
+    "pinyin": "sòng(v.)",
+    "meaning": "to give; to send"
+  },
+  {
+    "char": "塑料袋",
+    "pinyin": "sùliào dài(n.)",
+    "meaning": "plastic bag"
+  },
+  {
+    "char": "酸",
+    "pinyin": "suān(adj.)",
+    "meaning": "sour"
+  },
+  {
+    "char": "岁",
+    "pinyin": "suì(m.)",
+    "meaning": "year(of age)"
+  },
+  {
+    "char": "所以",
+    "pinyin": "suǒyǐ(conj.)",
+    "meaning": "so"
+  },
+  {
+    "char": "宿舍",
+    "pinyin": "sùshè(n.)",
+    "meaning": "dormitory"
+  },
+  {
+    "char": "他",
+    "pinyin": "tā(pron.)",
+    "meaning": "he; him"
+  },
+  {
+    "char": "它",
+    "pinyin": "tā(pron.)",
+    "meaning": "it"
+  },
+  {
+    "char": "她",
+    "pinyin": "tā(pron.)",
+    "meaning": "she; her"
+  },
+  {
+    "char": "台",
+    "pinyin": "tái(nm.)",
+    "meaning": "measure word"
+  },
+  {
+    "char": "太",
+    "pinyin": "tài(adv.)",
+    "meaning": "too"
+  },
+  {
+    "char": "谈",
+    "pinyin": "tán(v.)",
+    "meaning": "to talk about"
+  },
+  {
+    "char": "弹",
+    "pinyin": "tán(v.)",
+    "meaning": "to play"
+  },
+  {
+    "char": "汤",
+    "pinyin": "tāng(n.)",
+    "meaning": "soup"
+  },
+  {
+    "char": "疼",
+    "pinyin": "téng(v.)",
+    "meaning": "sore; painful"
+  },
+  {
+    "char": "踢",
+    "pinyin": "tī(v.)",
+    "meaning": "play"
+  },
+  {
+    "char": "体温",
+    "pinyin": "tǐwēn(n.)",
+    "meaning": "(body) temperature"
+  },
+  {
+    "char": "体育",
+    "pinyin": "tǐyù(n.)",
+    "meaning": "sports"
+  },
+  {
+    "char": "吃",
+    "pinyin": "chī(v.)",
+    "meaning": "to eat"
+  },
+  {
+    "char": "吃饭",
+    "pinyin": "chīfàn",
+    "meaning": "to have a meal"
+  },
+  {
+    "char": "出",
+    "pinyin": "chū(v.)",
+    "meaning": "to be out"
+  },
+  {
+    "char": "出去",
+    "pinyin": "chūqù(v.)",
+    "meaning": "to go out"
+  },
+  {
+    "char": "出租车",
+    "pinyin": "chūzūchē(n.)",
+    "meaning": "taxi"
+  },
+  {
+    "char": "厨房",
+    "pinyin": "chúfáng(n.)",
+    "meaning": "kitchen"
+  },
+  {
+    "char": "穿",
+    "pinyin": "chuān(v.)",
+    "meaning": "to wear"
+  },
+  {
+    "char": "窗户",
+    "pinyin": "chuānghu(n.)",
+    "meaning": "window"
+  },
+  {
+    "char": "聪明",
+    "pinyin": "cōngmíng(adj.)",
+    "meaning": "clever"
+  },
+  {
+    "char": "从",
+    "pinyin": "cóng(prep.)",
+    "meaning": "from"
+  },
+  {
+    "char": "打电话",
+    "pinyin": "dǎ diànhuà",
+    "meaning": "to make a call"
+  },
+  {
+    "char": "打算",
+    "pinyin": "dǎsuàn(v.)",
+    "meaning": "to plan"
+  },
+  {
+    "char": "打折",
+    "pinyin": "dǎzhé(sv.)",
+    "meaning": "to discount"
+  },
+  {
+    "char": "打针",
+    "pinyin": "dǎzhēn(sv.)",
+    "meaning": "to give injection"
+  },
+  {
+    "char": "大",
+    "pinyin": "dà(adj.)",
+    "meaning": "big"
+  },
+  {
+    "char": "大家",
+    "pinyin": "dàjiā(pron.)",
+    "meaning": "everybody"
+  },
+  {
+    "char": "大小",
+    "pinyin": "dàxiǎo(n.)",
+    "meaning": "size"
+  },
+  {
+    "char": "带",
+    "pinyin": "dài(v.)",
+    "meaning": "to bring"
+  },
+  {
+    "char": "但是",
+    "pinyin": "dànshì(conj.)",
+    "meaning": "but; however"
+  },
+  {
+    "char": "蛋糕",
+    "pinyin": "dàngāo(n.)",
+    "meaning": "cake"
+  },
+  {
+    "char": "当然",
+    "pinyin": "dāngrán(adv.)",
+    "meaning": "of course"
+  },
+  {
+    "char": "得",
+    "pinyin": "de(sa.)",
+    "meaning": "particle"
+  },
+  {
+    "char": "的",
+    "pinyin": "de(sa.)",
+    "meaning": "of (possessive)"
+  },
+  {
+    "char": "等",
+    "pinyin": "děng(v.)",
+    "meaning": "to wait for"
+  },
+  {
+    "char": "弟弟",
+    "pinyin": "dìdi(n.)",
+    "meaning": "younger brother"
+  },
+  {
+    "char": "地图",
+    "pinyin": "dìtú(n.)",
+    "meaning": "map"
+  },
+  {
+    "char": "点",
+    "pinyin": "diǎn(v.)",
+    "meaning": "to order dishes"
+  },
+  {
+    "char": "电话",
+    "pinyin": "diànhuà(n.)",
+    "meaning": "telephone"
+  },
+  {
+    "char": "认识",
+    "pinyin": "rènshi(v.)",
+    "meaning": "to know"
+  },
+  {
+    "char": "沙发",
+    "pinyin": "shāfā(n.)",
+    "meaning": "sofa"
+  },
+  {
+    "char": "山",
+    "pinyin": "shān(n.)",
+    "meaning": "mountain"
+  },
+  {
+    "char": "商店",
+    "pinyin": "shāngdiàn(n.)",
+    "meaning": "store; shop"
+  },
+  {
+    "char": "上",
+    "pinyin": "shàng(n.)",
+    "meaning": "upside"
+  },
+  {
+    "char": "上课",
+    "pinyin": "shàngkè(v.)",
+    "meaning": "to go to class"
+  },
+  {
+    "char": "上网",
+    "pinyin": "shàngwǎng(sv.)",
+    "meaning": "to be online"
+  },
+  {
+    "char": "上午",
+    "pinyin": "shàngwǔ(n.)",
+    "meaning": "forenoon"
+  },
+  {
+    "char": "少",
+    "pinyin": "shǎo(adj.)",
+    "meaning": "few; little"
+  },
+  {
+    "char": "谁",
+    "pinyin": "shéi(pron.)",
+    "meaning": "who"
+  },
+  {
+    "char": "身体",
+    "pinyin": "shēntǐ(n.)",
+    "meaning": "body"
+  },
+  {
+    "char": "什么",
+    "pinyin": "shénme(pron.)",
+    "meaning": "what"
+  },
+  {
+    "char": "什么的",
+    "pinyin": "shénme de",
+    "meaning": "and so on"
+  },
+  {
+    "char": "生病",
+    "pinyin": "shēngbìng(v.)",
+    "meaning": "to be sick"
+  },
+  {
+    "char": "生活",
+    "pinyin": "shēnghuó(n./v.)",
+    "meaning": "life"
+  },
+  {
+    "char": "生日",
+    "pinyin": "shēngrì(n.)",
+    "meaning": "birthday"
+  },
+  {
+    "char": "狮子",
+    "pinyin": "shīzi(n.)",
+    "meaning": "lion"
+  },
+  {
+    "char": "十",
+    "pinyin": "shí(num.)",
+    "meaning": "ten"
+  },
+  {
+    "char": "时候",
+    "pinyin": "shíhou(n.)",
+    "meaning": "time; moment"
+  },
+  {
+    "char": "时间",
+    "pinyin": "shíjiān(n.)",
+    "meaning": "time"
+  },
+  {
+    "char": "市场",
+    "pinyin": "shìchǎng(n.)",
+    "meaning": "market"
+  },
+  {
+    "char": "世界",
+    "pinyin": "shìjiè(n.)",
+    "meaning": "world"
+  },
+  {
+    "char": "事",
+    "pinyin": "shì",
+    "meaning": "thing"
+  },
+  {
+    "char": "试",
+    "pinyin": "shì(v.)",
+    "meaning": "to try"
+  },
+  {
+    "char": "是",
+    "pinyin": "shì(v.)",
+    "meaning": "be(is;am;are)"
+  },
+  {
+    "char": "适合",
+    "pinyin": "shìhé(v.)",
+    "meaning": "to suit"
+  },
+  {
+    "char": "手表",
+    "pinyin": "shǒubiǎo(n.)",
+    "meaning": "watch"
+  },
+  {
+    "char": "首都",
+    "pinyin": "shǒudū(n.)",
+    "meaning": "capital"
+  },
+  {
+    "char": "饮料",
+    "pinyin": "yǐnliào(n.)",
+    "meaning": "drink"
+  },
+  {
+    "char": "英语",
+    "pinyin": "Yīngyǔ(n.)",
+    "meaning": "English(language)"
+  },
+  {
+    "char": "游戏",
+    "pinyin": "yóuxì(n.)",
+    "meaning": "game"
+  },
+  {
+    "char": "游泳",
+    "pinyin": "yóuyǒng(sv.)",
+    "meaning": "to swim"
+  },
+  {
+    "char": "有",
+    "pinyin": "yǒu(v.)",
+    "meaning": "have; possess"
+  },
+  {
+    "char": "有点儿",
+    "pinyin": "yǒudiǎnr(adv.)",
+    "meaning": "a little; a bit"
+  },
+  {
+    "char": "有名",
+    "pinyin": "yǒumíng(adj.)",
+    "meaning": "well-known"
+  },
+  {
+    "char": "有意思",
+    "pinyin": "yǒu yìsi",
+    "meaning": "interesting"
+  },
+  {
+    "char": "又",
+    "pinyin": "yòu(adv.)",
+    "meaning": "and; again"
+  },
+  {
+    "char": "右边",
+    "pinyin": "yòubiān(n.)",
+    "meaning": "right (side)"
+  },
+  {
+    "char": "鱼",
+    "pinyin": "yú(n.)",
+    "meaning": "fish"
+  },
+  {
+    "char": "羽毛球",
+    "pinyin": "yǔmáoqiú(n.)",
+    "meaning": "badminton"
+  },
+  {
+    "char": "元",
+    "pinyin": "yuán(nm.)",
+    "meaning": "yuan(currency)"
+  },
+  {
+    "char": "远",
+    "pinyin": "yuǎn(adj.)",
+    "meaning": "far"
+  },
+  {
+    "char": "月",
+    "pinyin": "yuè(n.)",
+    "meaning": "month"
+  },
+  {
+    "char": "阅读",
+    "pinyin": "yuèdú(n.)",
+    "meaning": "reading"
+  },
+  {
+    "char": "运动",
+    "pinyin": "yùndòng(n.)",
+    "meaning": "sports"
+  },
+  {
+    "char": "再",
+    "pinyin": "zài(adv.)",
+    "meaning": "again"
+  },
+  {
+    "char": "在",
+    "pinyin": "zài(adv.)",
+    "meaning": "in; at"
+  },
+  {
+    "char": "早饭",
+    "pinyin": "zǎofàn(n.)",
+    "meaning": "breakfast"
+  },
+  {
+    "char": "早上",
+    "pinyin": "zǎoshàng(n.)",
+    "meaning": "early morning"
+  },
+  {
+    "char": "怎么",
+    "pinyin": "zěnme(pron.)",
+    "meaning": "how"
+  },
+  {
+    "char": "怎么样",
+    "pinyin": "zěnmeyàng(pron.)",
+    "meaning": "how; how about"
+  },
+  {
+    "char": "张",
+    "pinyin": "zhāng(nm.)",
+    "meaning": "sheet"
+  },
+  {
+    "char": "找",
+    "pinyin": "zhǎo(v.)",
+    "meaning": "to find; look for"
+  },
+  {
+    "char": "本",
+    "pinyin": "běn(nm.)",
+    "meaning": "measure word"
+  },
+  {
+    "char": "比较",
+    "pinyin": "bǐjiào(adv.)",
+    "meaning": "comparatively"
+  },
+  {
+    "char": "比赛",
+    "pinyin": "bǐsài(n.)",
+    "meaning": "competition"
+  },
+  {
+    "char": "笔记本",
+    "pinyin": "bǐjìběn(n.)",
+    "meaning": "notebook"
+  },
+  {
+    "char": "别的",
+    "pinyin": "biéde(pron.)",
+    "meaning": "other"
+  },
+  {
+    "char": "宾馆",
+    "pinyin": "bīnguǎn(n.)",
+    "meaning": "hotel"
+  },
+  {
+    "char": "冰箱",
+    "pinyin": "bīngxiāng(n.)",
+    "meaning": "refrigerator"
+  },
+  {
+    "char": "饼干",
+    "pinyin": "bǐnggān(n.)",
+    "meaning": "biscuit"
+  },
+  {
+    "char": "病",
+    "pinyin": "bìng(n.)",
+    "meaning": "illness"
+  },
+  {
+    "char": "不",
+    "pinyin": "bù(adv.)",
+    "meaning": "no;not"
+  },
+  {
+    "char": "不错",
+    "pinyin": "búcuò(adj.)",
+    "meaning": "not bad"
+  },
+  {
+    "char": "不过",
+    "pinyin": "búguò(conj.)",
+    "meaning": "however"
+  },
+  {
+    "char": "不客气",
+    "pinyin": "bú kèqi",
+    "meaning": "You are welcome"
+  },
+  {
+    "char": "猜",
+    "pinyin": "cāi(v.)",
+    "meaning": "to guess"
+  },
+  {
+    "char": "才",
+    "pinyin": "cái(adv.)",
+    "meaning": "just"
+  },
+  {
+    "char": "菜",
+    "pinyin": "cài(n.)",
+    "meaning": "dish; food"
+  },
+  {
+    "char": "菜单",
+    "pinyin": "càidān(n.)",
+    "meaning": "menu"
+  },
+  {
+    "char": "参加",
+    "pinyin": "cānjiā(v.)",
+    "meaning": "to join; to attend"
+  },
+  {
+    "char": "层",
+    "pinyin": "céng(nm.)",
+    "meaning": "floor"
+  },
+  {
+    "char": "茶",
+    "pinyin": "chá(n.)",
+    "meaning": "tea"
+  },
+  {
+    "char": "差",
+    "pinyin": "chà(v.)",
+    "meaning": "to fall short of"
+  },
+  {
+    "char": "长",
+    "pinyin": "cháng(adj.)",
+    "meaning": "long"
+  },
+  {
+    "char": "常常",
+    "pinyin": "chángcháng(adv.)",
+    "meaning": "often; usually"
+  },
+  {
+    "char": "唱歌",
+    "pinyin": "chàng gē(sv.)",
+    "meaning": "to sing"
+  },
+  {
+    "char": "超市",
+    "pinyin": "chāoshì(n.)",
+    "meaning": "supermarket"
+  },
+  {
+    "char": "炒",
+    "pinyin": "chǎo(v.)",
+    "meaning": "stir fry"
+  },
+  {
+    "char": "衬衫",
+    "pinyin": "chènshān(n.)",
+    "meaning": "shirt"
+  },
+  {
+    "char": "城市",
+    "pinyin": "chéngshì(n.)",
+    "meaning": "city"
+  },
+  {
+    "char": "黑板",
+    "pinyin": "hēibǎn(n.)",
+    "meaning": "blackboard"
+  },
+  {
+    "char": "很",
+    "pinyin": "hěn(adv.)",
+    "meaning": "very; quite"
+  },
+  {
+    "char": "红",
+    "pinyin": "hóng(adj.)",
+    "meaning": "red"
+  },
+  {
+    "char": "猴子",
+    "pinyin": "hóuzi(n.)",
+    "meaning": "monkey"
+  },
+  {
+    "char": "后面",
+    "pinyin": "hòumiàn(n.)",
+    "meaning": "behind"
+  },
+  {
+    "char": "互相",
+    "pinyin": "hùxiāng(adv.)",
+    "meaning": "mutually"
+  },
+  {
+    "char": "欢迎",
+    "pinyin": "huānyíng(v.)",
+    "meaning": "welcome"
+  },
+  {
+    "char": "黄",
+    "pinyin": "huáng(adj.)",
+    "meaning": "yellow"
+  },
+  {
+    "char": "回",
+    "pinyin": "huí(v.)",
+    "meaning": "to return"
+  },
+  {
+    "char": "会",
+    "pinyin": "huì(aux.)",
+    "meaning": "can; be able to"
+  },
+  {
+    "char": "或者",
+    "pinyin": "huòzhě(conj.)",
+    "meaning": "or"
+  },
+  {
+    "char": "鸡蛋",
+    "pinyin": "jīdàn(n.)",
+    "meaning": "egg"
+  },
+  {
+    "char": "鸡肉",
+    "pinyin": "jīròu(n.)",
+    "meaning": "chicken"
+  },
+  {
+    "char": "几",
+    "pinyin": "jǐ(pron.)",
+    "meaning": "how many"
+  },
+  {
+    "char": "家",
+    "pinyin": "jiā(n.)",
+    "meaning": "home; family"
+  },
+  {
+    "char": "家具",
+    "pinyin": "jiājù(n.)",
+    "meaning": "furniture"
+  },
+  {
+    "char": "价格",
+    "pinyin": "jiàgé(n.)",
+    "meaning": "price"
+  },
+  {
+    "char": "检查",
+    "pinyin": "jiǎnchá(v.)",
+    "meaning": "to check"
+  },
+  {
+    "char": "见",
+    "pinyin": "jiàn(v.)",
+    "meaning": "to meet"
+  },
+  {
+    "char": "见面",
+    "pinyin": "jiànmiàn(v.)",
+    "meaning": "to meet"
+  },
+  {
+    "char": "件",
+    "pinyin": "jiàn(nm.)",
+    "meaning": "measure word"
+  },
+  {
+    "char": "饺子",
+    "pinyin": "jiǎozi(n.)",
+    "meaning": "dumpling"
+  },
+  {
+    "char": "叫",
+    "pinyin": "jiào(v.)",
+    "meaning": "called; to call"
+  },
+  {
+    "char": "教",
+    "pinyin": "jiāo(v.)",
+    "meaning": "teach"
+  },
+  {
+    "char": "教室",
+    "pinyin": "jiàoshì(n.)",
+    "meaning": "classroom"
+  },
+  {
+    "char": "姐姐",
+    "pinyin": "jiějie(n.)",
+    "meaning": "elder sister"
+  },
+  {
+    "char": "介绍",
+    "pinyin": "jièshào(v.)",
+    "meaning": "to introduce"
+  },
+  {
+    "char": "斤",
+    "pinyin": "jīn(nm.)",
+    "meaning": "measure word"
+  },
+  {
+    "char": "今天",
+    "pinyin": "jīntiān(n.)",
+    "meaning": "today"
+  },
+  {
+    "char": "进",
+    "pinyin": "jìn(v.)",
+    "meaning": "come in"
+  },
+  {
+    "char": "学校",
+    "pinyin": "xuéxiào(n.)",
+    "meaning": "school"
+  },
+  {
+    "char": "严重",
+    "pinyin": "yánzhòng(adj.)",
+    "meaning": "serious"
+  },
+  {
+    "char": "颜色",
+    "pinyin": "yánsè(n.)",
+    "meaning": "color"
+  },
+  {
+    "char": "羊肉",
+    "pinyin": "yángròu(n.)",
+    "meaning": "mutton"
+  },
+  {
+    "char": "养成",
+    "pinyin": "yǎngchéng(v.)",
+    "meaning": "to raise"
+  },
+  {
+    "char": "邀请",
+    "pinyin": "yāoqǐng(v.)",
+    "meaning": "to invite"
+  },
+  {
+    "char": "药",
+    "pinyin": "yào(n.)",
+    "meaning": "medicine"
+  },
+  {
+    "char": "要",
+    "pinyin": "yào(v.)",
+    "meaning": "to want"
+  },
+  {
+    "char": "也",
+    "pinyin": "yě(adv.)",
+    "meaning": "also; too"
+  },
+  {
+    "char": "一",
+    "pinyin": "yī(num.)",
+    "meaning": "one"
+  },
+  {
+    "char": "衣服",
+    "pinyin": "yīfu(n.)",
+    "meaning": "clothing"
+  },
+  {
+    "char": "医生",
+    "pinyin": "yīshēng(n.)",
+    "meaning": "doctor"
+  },
+  {
+    "char": "医院",
+    "pinyin": "yīyuàn(n.)",
+    "meaning": "hospital"
+  },
+  {
+    "char": "一定",
+    "pinyin": "yídìng(adv.)",
+    "meaning": "certainly"
+  },
+  {
+    "char": "一共",
+    "pinyin": "yígòng(adv.)",
+    "meaning": "altogether"
+  },
+  {
+    "char": "一下儿",
+    "pinyin": "yíxiàr",
+    "meaning": "once; briefly"
+  },
+  {
+    "char": "一样",
+    "pinyin": "yíyàng(adj.)",
+    "meaning": "same"
+  },
+  {
+    "char": "已经",
+    "pinyin": "yǐjīng(adv.)",
+    "meaning": "already"
+  },
+  {
+    "char": "以后",
+    "pinyin": "yǐhòu(n.)",
+    "meaning": "later; after"
+  },
+  {
+    "char": "以前",
+    "pinyin": "yǐqián(n.)",
+    "meaning": "before"
+  },
+  {
+    "char": "椅子",
+    "pinyin": "yǐzi(n.)",
+    "meaning": "chair"
+  },
+  {
+    "char": "一边",
+    "pinyin": "yìbiān",
+    "meaning": "at the same time"
+  },
+  {
+    "char": "一点儿",
+    "pinyin": "(yì)diǎnr(nm.)",
+    "meaning": "a little"
+  },
+  {
+    "char": "一起",
+    "pinyin": "yìqǐ(adv.)",
+    "meaning": "together"
+  },
+  {
+    "char": "一直",
+    "pinyin": "yìzhí(adv.)",
+    "meaning": "always"
+  },
+  {
+    "char": "因为",
+    "pinyin": "yīnwèi(conj.)",
+    "meaning": "because"
+  },
+  {
+    "char": "音乐",
+    "pinyin": "yīnyuè(n.)",
+    "meaning": "music"
+  },
+  {
+    "char": "银行",
+    "pinyin": "yínháng(n.)",
+    "meaning": "bank"
+  },
+  {
+    "char": "下课",
+    "pinyin": "xiàkè(v.)",
+    "meaning": "to finish class"
+  },
+  {
+    "char": "下午",
+    "pinyin": "xiàwǔ(n.)",
+    "meaning": "afternoon"
+  },
+  {
+    "char": "先",
+    "pinyin": "xiān(adv.)",
+    "meaning": "first"
+  },
+  {
+    "char": "咸",
+    "pinyin": "xián(adj.)",
+    "meaning": "salty"
+  },
+  {
+    "char": "现在",
+    "pinyin": "xiànzài(n.)",
+    "meaning": "now"
+  },
+  {
+    "char": "香蕉",
+    "pinyin": "xiāngjiāo(n.)",
+    "meaning": "banana"
+  },
+  {
+    "char": "小",
+    "pinyin": "xiǎo(adj.)",
+    "meaning": "small"
+  },
+  {
+    "char": "小说",
+    "pinyin": "xiǎoshuō(n.)",
+    "meaning": "novel"
+  },
+  {
+    "char": "些",
+    "pinyin": "xiē(nm.)",
+    "meaning": "some"
+  },
+  {
+    "char": "鞋",
+    "pinyin": "xié(n.)",
+    "meaning": "shoe"
+  },
+  {
+    "char": "写",
+    "pinyin": "xiě(v.)",
+    "meaning": "write"
+  },
+  {
+    "char": "谢谢",
+    "pinyin": "xièxie(v.)",
+    "meaning": "thank you"
+  },
+  {
+    "char": "新鲜",
+    "pinyin": "xīnxiān(adj.)",
+    "meaning": "fresh"
+  },
+  {
+    "char": "信用卡",
+    "pinyin": "xìnyòngkǎ(n.)",
+    "meaning": "credit card"
+  },
+  {
+    "char": "星期",
+    "pinyin": "xīngqī(n.)",
+    "meaning": "week"
+  },
+  {
+    "char": "星期一",
+    "pinyin": "xīngqīyī(n.)",
+    "meaning": "Monday"
+  },
+  {
+    "char": "星期二",
+    "pinyin": "xīngqī'èr(n.)",
+    "meaning": "Tuesday"
+  },
+  {
+    "char": "星期三",
+    "pinyin": "xīngqīsān(n.)",
+    "meaning": "Wednesday"
+  },
+  {
+    "char": "星期四",
+    "pinyin": "xīngqīsì(n.)",
+    "meaning": "Thursday"
+  },
+  {
+    "char": "星期五",
+    "pinyin": "xīngqīwǔ(n.)",
+    "meaning": "Friday"
+  },
+  {
+    "char": "星期六",
+    "pinyin": "xīngqīliù(n.)",
+    "meaning": "Saturday"
+  },
+  {
+    "char": "星期天",
+    "pinyin": "xīngqītiān(n.)",
+    "meaning": "Sunday"
+  },
+  {
+    "char": "兴趣",
+    "pinyin": "xìngqù(n.)",
+    "meaning": "interest"
+  },
+  {
+    "char": "姓",
+    "pinyin": "xìng(n.)",
+    "meaning": "surname"
+  },
+  {
+    "char": "熊猫",
+    "pinyin": "xióngmāo(n.)",
+    "meaning": "panda"
+  },
+  {
+    "char": "休息",
+    "pinyin": "xiūxi(v.)",
+    "meaning": "to take a rest"
+  },
+  {
+    "char": "需要",
+    "pinyin": "xūyào(v.)",
+    "meaning": "to need; to want"
+  },
+  {
+    "char": "学生",
+    "pinyin": "xuésheng(n.)",
+    "meaning": "student"
+  },
+  {
+    "char": "学习",
+    "pinyin": "xuéxí(v.)",
+    "meaning": "to learn; to study"
+  },
+  {
+    "char": "啊",
+    "pinyin": "a(mp.)",
+    "meaning": "ah; oh"
+  },
+  {
+    "char": "爱",
+    "pinyin": "ài(v.)",
+    "meaning": "to love"
+  },
+  {
+    "char": "爱好",
+    "pinyin": "àihào(n./v.)",
+    "meaning": "hobby; to like"
+  },
+  {
+    "char": "安静",
+    "pinyin": "ānjìng(adj.)",
+    "meaning": "be quiet"
+  },
+  {
+    "char": "把",
+    "pinyin": "bǎ(nm.)",
+    "meaning": "measure word"
+  },
+  {
+    "char": "爸爸",
+    "pinyin": "bàba(n.)",
+    "meaning": "dad"
+  },
+  {
+    "char": "吧",
+    "pinyin": "ba(mp.)",
+    "meaning": "particle"
+  },
+  {
+    "char": "白",
+    "pinyin": "bái(adj.)",
+    "meaning": "white"
+  },
+  {
+    "char": "班",
+    "pinyin": "bān(n.)",
+    "meaning": "class"
+  },
+  {
+    "char": "半",
+    "pinyin": "bàn(n.)",
+    "meaning": "half"
+  },
+  {
+    "char": "办公室",
+    "pinyin": "bàngōngshì(n.)",
+    "meaning": "office"
+  },
+  {
+    "char": "帮助",
+    "pinyin": "bāngzhù(v.)",
+    "meaning": "to help"
+  },
+  {
+    "char": "包子",
+    "pinyin": "bāozi(n.)",
+    "meaning": "steamed bun"
+  },
+  {
+    "char": "杯",
+    "pinyin": "bēi(nm.)",
+    "meaning": "glass"
+  },
+  {
+    "char": "杯子",
+    "pinyin": "bēizi(n.)",
+    "meaning": "cup"
+  },
+  {
+    "char": "北",
+    "pinyin": "běi(n.)",
+    "meaning": "north"
+  },
+  {
+    "char": "北方",
+    "pinyin": "běifāng(n.)",
+    "meaning": "northern"
+  }
+];
 
-    function flip() {
-      const flipped = cardEl.classList.toggle('flipped');
-      cardEl.setAttribute('aria-pressed', flipped);
-      // When flipped to back (true), play pronunciation of the Chinese word
-      if(flipped){
-        const c = cards[index];
-        // prefer speaking the character(s) — TTS handles Chinese best
-        speakChinese(c.char);
-      } else {
-        // if flipping back to front, stop speaking
-        if(synth) synth.cancel();
-      }
-    }
+        let displayedVocabulary = [...vocabulary];
 
-    prevBtn.addEventListener('click', () => {
-      if (cards.length <= 1) return;
-      index = (index - 1 + cards.length) % cards.length;
-      render();
-    });
+        // Display cards
+        function displayCards(vocabList) {
+            const grid = document.getElementById('cardsGrid');
+            const noResults = document.getElementById('noResults');
+            const cardCount = document.getElementById('cardCount');
 
-    nextBtn.addEventListener('click', () => {
-      if (cards.length <= 1) return;
-      index = (index + 1) % cards.length;
-      render();
-    });
+            grid.innerHTML = '';
+            writerInstances.clear();
 
-    flipBtn.addEventListener('click', flip);
-    cardEl.addEventListener('click', flip);
-    cardEl.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); flip(); }});
+            if (vocabList.length === 0) {
+                noResults.style.display = 'block';
+                cardCount.textContent = 'Total Cards: 0';
+                return;
+            }
 
-    // keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') prevBtn.click();
-      if (e.key === 'ArrowRight') nextBtn.click();
-      if (e.code === 'Space') { e.preventDefault(); flip(); }
-    });
+            noResults.style.display = 'none';
+            cardCount.textContent = `Total Cards: ${vocabList.length}`;
 
-    // Ensure voices loaded (some browsers load asynchronously)
-    if(synth){
-      // try to load voices if not present
-      synth.onvoiceschanged = () => { /* voices updated, nothing else to do */ };
-    }
+            vocabList.forEach((item, index) => {
+                const firstChar = item.char.charAt(0);
+                const writerId = `writer-${index}`;
 
-    // initial render
-    render();
-  </script>
+                const cardContainer = document.createElement('div');
+                cardContainer.className = 'card-container';
+
+                cardContainer.innerHTML = `
+                    <div class="card" data-char="${item.char}" data-writer-id="${writerId}">
+                        <div class="card-front">
+                            <div id="${writerId}" class="hanzi-writer-container"></div>
+                            <div class="stroke-hint">✍️ Hover to see stroke order</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="audio-indicator">🔊 Playing...</div>
+                            <div class="pinyin">${item.pinyin}</div>
+                            <div class="meaning">${item.meaning}</div>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(cardContainer);
+
+                // Create HanziWriter and event listeners
+                setTimeout(() => {
+                    try {
+                        const writer = createHanziWriter(writerId, firstChar);
+                        writerInstances.set(writerId, writer);
+
+                        const card = cardContainer.querySelector('.card');
+                        const cardFront = cardContainer.querySelector('.card-front');
+
+                        // Click to flip and play audio
+                        card.addEventListener('click', function(e) {
+                            flipCard(this);
+                        });
+
+                        // Hover for stroke animation (only when card is not flipped)
+                        let isAnimating = false;
+                        cardFront.addEventListener('mouseenter', function() {
+                            if (!card.classList.contains('flipped') && !isAnimating) {
+                                isAnimating = true;
+                                writer.animateCharacter({
+                                    onComplete: () => {
+                                        isAnimating = false;
+                                    }
+                                });
+                            }
+                        });
+
+                    } catch (error) {
+                        console.log('Character not supported:', firstChar);
+                    }
+                }, 50);
+            });
+        }
+
+        // Flip card and play audio
+        function flipCard(cardElement) {
+            const isFlipped = cardElement.classList.contains('flipped');
+
+            // Flip the card
+            cardElement.classList.toggle('flipped');
+
+            // Play audio when flipped to back
+            if (!isFlipped) {
+                const charText = cardElement.getAttribute('data-char');
+                setTimeout(() => {
+                    speakChinese(charText, cardElement);
+                }, 400); // Delay for animation sync
+            } else {
+                // Stop audio when flipped back
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        // Flip all cards
+        function flipAllCards() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                if (!card.classList.contains('flipped')) {
+                    card.classList.add('flipped');
+                }
+            });
+        }
+
+        // Reset all cards
+        function resetAllCards() {
+            window.speechSynthesis.cancel();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.classList.remove('flipped');
+            });
+        }
+
+        // Shuffle cards
+        function shuffleCards() {
+            window.speechSynthesis.cancel();
+            displayedVocabulary = [...vocabulary].sort(() => Math.random() - 0.5);
+            displayCards(displayedVocabulary);
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            window.speechSynthesis.cancel();
+            const searchTerm = e.target.value.toLowerCase().trim();
+
+            if (searchTerm === '') {
+                displayedVocabulary = [...vocabulary];
+                displayCards(displayedVocabulary);
+                return;
+            }
+
+            const filtered = vocabulary.filter(item => {
+                return item.char.toLowerCase().includes(searchTerm) ||
+                       item.pinyin.toLowerCase().includes(searchTerm) ||
+                       item.meaning.toLowerCase().includes(searchTerm);
+            });
+
+            displayedVocabulary = filtered;
+            displayCards(filtered);
+        });
+
+        // Initial display
+        displayCards(vocabulary);
+
+        // Load voices
+        window.addEventListener('load', () => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.getVoices();
+            }
+        });
+    </script>
 </body>
 </html>
